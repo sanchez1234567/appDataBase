@@ -1,62 +1,41 @@
 import "./App.css";
-import { styled } from "@mui/material/styles";
-import Paper from "@mui/material/Paper";
-import React from "react";
-import CssBaseline from "@mui/material/CssBaseline";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
+import React, { useState, useEffect, useContext } from "react";
+import { CssBaseline, Box, Container } from "@mui/material";
 import Header from "./header.js";
-import MakeTree from "./tree.js";
-import ShowTree from "./button1.js";
-import HideTree from "./button2.js";
-import TempButton from "./button3.js";
-import FolderInfo from "./folderInfo.js";
+import TreeButtonsFolder from "./treeButtonsFolder.js";
+
+const DataContext = React.createContext();
+const useData = () => useContext(DataContext);
 
 function App() {
-  const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlighn: "center",
-    color: theme.palette.text.secondary,
-  }));
+  const [data, setData] = useState([]);
+  const fetchData = async () => {
+    const response = await fetch("http://localhost:5000");
+    const result = await response.json();
+    setData(result);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const flush = () => setData([]);
 
   return (
-    <React.Fragment>
-      <CssBaseline />
-      <Container maxWidth="md">
-        <Box sx={{ bgcolor: "#CFD8DC", height: 720, width: 700, boxShadow: 2 }}>
-          <Box sx={{ flexGrow: 1, mt: 0.5 }}>
-            <Grid container spacing={1}>
-              <Grid item xs={12}>
-                <Item>
-                  <Header />
-                </Item>
-              </Grid>
-              <Grid item xs={9}>
-                <Item>
-                  <MakeTree />
-                </Item>
-              </Grid>
-              <Grid item xs={3}>
-                <Item>
-                  <ShowTree />
-                  <HideTree />
-                  <TempButton />
-                </Item>
-              </Grid>
-              <Grid item xs={12}>
-                <Item>
-                  <FolderInfo />
-                </Item>
-              </Grid>
-            </Grid>
+    <DataContext.Provider value={{ data, fetchData, flush }}>
+      <React.Fragment>
+        <CssBaseline />
+        <Container maxWidth="md">
+          <Box
+            sx={{ bgcolor: "#CFD8DC", height: 720, width: 700, boxShadow: 2 }}
+          >
+            <Header />
+            <TreeButtonsFolder />
           </Box>
-        </Box>
-      </Container>
-    </React.Fragment>
+        </Container>
+      </React.Fragment>
+    </DataContext.Provider>
   );
 }
 
-export default App;
+export { App, useData };
