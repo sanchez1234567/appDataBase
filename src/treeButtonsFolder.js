@@ -31,9 +31,9 @@ import { useData } from "./App.js";
 // };
 
 export default function TreeButtonsFolder() {
-  const [folder, setFolder] = useState("Folder");
-  const getNameFolder = (fold) => {
-    setFolder(`${fold}`);
+  const [connect, setConnect] = useState("Connect");
+  const getNameConnect = (fold) => {
+    setConnect(`${fold}`);
   };
 
   const renderTree = (nodes) => (
@@ -41,7 +41,7 @@ export default function TreeButtonsFolder() {
       key={nodes.id}
       nodeId={nodes.id}
       label={nodes.name}
-      onClick={() => getNameFolder(nodes.id)}
+      onClick={() => getNameConnect(nodes.connect)}
     >
       {Array.isArray(nodes.children)
         ? nodes.children.map((node) => renderTree(node))
@@ -81,7 +81,7 @@ export default function TreeButtonsFolder() {
         </Grid>
         <Grid item xs={12}>
           <Item>
-            <Typography variant="h7">{folder}</Typography>
+            <Typography variant="h7">{connect}</Typography>
           </Item>
         </Grid>
       </Grid>

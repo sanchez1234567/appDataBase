@@ -36,7 +36,8 @@ server.on("request", (req, res) => {
 
   if (pathName === "/") {
     ext = ".json";
-    pathName = "/data.json";
+    // pathName = "/data.json";
+    pathName = "/testData.v8i";
   } else if (!ext) {
     ext = ".json";
     pathName += ext;
@@ -46,7 +47,8 @@ server.on("request", (req, res) => {
   fs.exists(filePath, function (exist, err) {
     if (!exist || !mimeTypes[ext]) {
       console.log("Файл не найден:" + pathName);
-      res.writeHead(404, { "Content-Type": "application/json" });
+      // res.writeHead(404, { "Content-Type": "application/json" });
+      res.writeHead(404, { "Content-Type": "text/html" });
       res.write("404 Not Found");
       res.end();
       return;
