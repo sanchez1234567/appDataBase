@@ -1,11 +1,21 @@
 import "./App.css";
 import React, { useState, useEffect, useContext } from "react";
-import { CssBaseline, Box, Container } from "@mui/material";
-import Header from "./header.js";
-import TreeButtonsFolder from "./treeButtonsFolder.js";
+import { CssBaseline, Box, Dialog } from "@mui/material";
+import { Typography, AppBar, Toolbar, IconButton } from "@mui/material";
+import Paper, { PaperProps } from "@mui/material/Paper";
+import InstallDesktopIcon from "@mui/icons-material/InstallDesktop";
+import SettingsIcon from "@mui/icons-material/Settings";
+import HelpIcon from "@mui/icons-material/Help";
+import GridViewIcon from "@mui/icons-material/GridView";
+import CancelIcon from "@mui/icons-material/Cancel";
+import TreeFolder from "./treeFolder.js";
 
 const DataContext = React.createContext();
 const useData = () => useContext(DataContext);
+
+function PaperComponent(props: PaperProps) {
+  return <Paper {...props} />;
+}
 
 function App() {
   const [data, setData] = useState([]);
@@ -17,9 +27,10 @@ function App() {
 
     let dataObj = {
       id: "root",
-      name: "DataBase",
+      name: "Базы данных",
       folder: "root",
       children: [],
+      connect: "root",
     };
 
     let flatArr = [];
@@ -42,7 +53,8 @@ function App() {
           }
           if (
             lineText[subindex].includes("Connect=File") ||
-            lineText[subindex].includes("Connect=ws")
+            lineText[subindex].includes("Connect=ws") ||
+            lineText[subindex].includes("Connect=Srvr")
           ) {
             flatArr[newID - 1].connect = lineText[subindex].slice(
               lineText[subindex].indexOf('"') + 1,
@@ -78,24 +90,53 @@ function App() {
     setData(dataObj);
   };
 
+  // console.log(data);
+
   useEffect(() => {
     fetchData();
   }, []);
 
-  const flush = () => setData([]);
-
   return (
-    <DataContext.Provider value={{ data, fetchData, flush }}>
+    <DataContext.Provider value={{ data }}>
       <React.Fragment>
         <CssBaseline />
-        <Container maxWidth="md">
+        <Dialog open={true} PaperComponent={PaperComponent}>
           <Box
-            sx={{ bgcolor: "#CFD8DC", height: 720, width: 700, boxShadow: 2 }}
+            sx={{
+              height: 455,
+              width: 530,
+              boxShadow: 1,
+            }}
           >
-            <Header />
-            <TreeButtonsFolder />
+            <Box sx={{ flexGrow: 1 }}>
+              <AppBar position="static">
+                <Toolbar>
+                  <GridViewIcon />
+                  <Typography
+                    variant="h6"
+                    component="div"
+                    sx={{ flexGrow: 1, ml: 1.5 }}
+                  >
+                    Запуск облачных баз
+                  </Typography>
+                  <IconButton component="label">
+                    <InstallDesktopIcon />
+                  </IconButton>
+                  <IconButton component="label">
+                    <SettingsIcon />
+                  </IconButton>
+                  <IconButton component="label">
+                    <HelpIcon />
+                  </IconButton>
+                  <IconButton component="label">
+                    <CancelIcon />
+                  </IconButton>
+                </Toolbar>
+              </AppBar>
+            </Box>
+            <TreeFolder />
           </Box>
-        </Container>
+        </Dialog>
       </React.Fragment>
     </DataContext.Provider>
   );
