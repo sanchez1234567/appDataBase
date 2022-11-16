@@ -1,0 +1,46 @@
+{
+  "AppSettings": {
+    "v8i": "http://localhost:5000",
+    "auth": true,
+    "WidgetType": {
+      "icon": true,
+      "dialog": false
+    }
+  },
+  "UserSettings": {
+    "Settings": {
+      "Header": "Настройки",
+      "OpenInNew": true,
+      "TreeView": true,
+      "LastSelect": [false, []],
+      "SortAZ": true
+    },
+    "Help": {
+      "Header": "Помощь/Поддержка",
+      "tel": "+7 888 888 88 88",
+      "email": "mail@site.ru",
+      "site": "https://www.site.ru",
+      "HelpMessage": {
+        "method": "POST",
+        "address": "https://www.site.ru/helpMessage"
+      }
+    },
+    "Setup": {
+      "Header": "Локальная установка",
+      "Pages": [
+        {
+          "Title": "Скачивание",
+          "PageTextAddress": "http://localhost:5000/page1"
+        },
+        {
+          "Title": "Установка",
+          "PageText": "http://localhost:5000/page2"
+        },
+        {
+          "Title": "Готово",
+          "PageText": "http://localhost:5000/page3"
+        }
+      ]
+    }
+  }
+}
