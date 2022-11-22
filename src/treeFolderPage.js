@@ -32,19 +32,11 @@ export default function TreeFolderPage() {
   const { lastSelect } = useData();
   const { selectedNodes } = useData();
   const { setSelectedNodes } = useData();
-
   const handleSelect = (event, nodeIds) => {
-    if (!selectedNodes.includes(String(nodeIds))) {
-      setSelectedNodes((selectedNodes) => selectedNodes.concat(nodeIds));
-    }
-    if (selectedNodes.includes(String(nodeIds))) {
-      setSelectedNodes(
-        selectedNodes.filter((node) => node !== String(nodeIds))
-      );
-    }
+    setSelectedNodes(nodeIds);
   };
 
-  const { localSetupHeader } = useData();
+  const { switchToSetupPage } = useData();
 
   const renderFolder = (folder) => {
     if (folder.includes("https")) {
@@ -106,8 +98,7 @@ export default function TreeFolderPage() {
           }}
         >
           <TreeView
-            multiSelect={lastSelect}
-            selected={selectedNodes}
+            selected={lastSelect ? selectedNodes : null}
             onNodeSelect={lastSelect ? handleSelect : null}
             aria-label="rich object"
             defaultCollapseIcon={<ExpandMoreIcon />}
@@ -122,8 +113,8 @@ export default function TreeFolderPage() {
           >
             {renderTree(
               treeView
-                ? BuildList(data, openLink, localSetupHeader, sortAZ)
-                : BuildTree(data, openLink, localSetupHeader)
+                ? BuildList(data, openLink, switchToSetupPage, sortAZ)
+                : BuildTree(data, openLink, switchToSetupPage, sortAZ)
             )}
           </TreeView>
         </Item>

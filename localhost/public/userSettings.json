@@ -1,6 +1,6 @@
 {
   "AppSettings": {
-    "v8i": "http://localhost:5000",
+    "v8i": "http://localhost:5000/userData",
     "auth": true,
     "WidgetType": {
       "icon": true,
@@ -12,7 +12,7 @@
       "Header": "Настройки",
       "OpenInNew": true,
       "TreeView": true,
-      "LastSelect": [false, []],
+      "LastSelect": [false, ""],
       "SortAZ": true
     },
     "Help": {
@@ -30,15 +30,15 @@
       "Pages": [
         {
           "Title": "Скачивание",
-          "PageTextAddress": "http://localhost:5000/page1"
+          "PageTextAddress": "https://jsonplaceholder.typicode.com/posts"
         },
         {
           "Title": "Установка",
-          "PageText": "http://localhost:5000/page2"
+          "PageText": "https://jsonplaceholder.typicode.com/posts/1"
         },
         {
           "Title": "Готово",
-          "PageText": "http://localhost:5000/page3"
+          "PageText": "https://jsonplaceholder.typicode.com/posts/1/comments"
         }
       ]
     }

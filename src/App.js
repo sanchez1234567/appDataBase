@@ -25,20 +25,15 @@ function PaperComponent(props: PaperProps) {
 function App() {
   const [appSettings, setAppSettings] = useState([]);
   const [wait, setWait] = useState(true);
-  const fetchSettings = async () => {
-    const responseSettings = await fetch("http://localhost:5000/settings");
-    const resultSettings = await responseSettings.json();
-    setAppSettings(resultSettings);
-  };
-
-  useEffect(() => {
-    fetchSettings().then(() => setWait(false));
-  }, []);
+  const [authValue, setAuthValue] = useState();
+  const [settingsErr, setSettingsErr] = useState();
+  const [dataErr, setDataErr] = useState();
 
   const [data, setData] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [header, setHeader] = useState("Запуск баз");
-  const [visibleAuth, setVisibleAuth] = useState(true);
+  const [header, setHeader] = useState("Список баз");
+
+  const [visibleAuth, setVisibleAuth] = useState();
   const [visibleTreeFolder, setVisibleTreeFolder] = useState(false);
   const [visibleLocalSetup, setVisibleLocalSetup] = useState(false);
   const [visibleSettings, setVisibleSettings] = useState(false);
@@ -51,7 +46,47 @@ function App() {
   const [selectedNodes, setSelectedNodes] = useState();
   const [sortAZ, setSortAZ] = useState();
 
-  const handleOpenDialog = () => {
+  const getAppSettings = async () => {
+    const responseSettings = await fetch(
+      "http://localhost:5000/defaultSettings"
+    );
+    if (responseSettings.ok) {
+      const resultSettings = await responseSettings.json();
+      setAppSettings(resultSettings);
+      setAuthValue(resultSettings.AppSettings.auth);
+      setVisibleAuth(resultSettings.AppSettings.auth);
+    }
+    if (!responseSettings.ok) {
+      throw new Error("Failed to fetch");
+    }
+  };
+
+  const getData = async () => {
+    try {
+      const responseData = await fetch(appSettings.AppSettings.v8i);
+      if (responseData.ok) {
+        const resultData = await responseData.text();
+        setData(resultData);
+      }
+      if (!responseData.ok || responseData.status === 404) {
+        throw new Error("Failed to fetch");
+      }
+    } catch (err) {
+      setDataErr(`${err}`);
+    }
+  };
+
+  useEffect(() => {
+    getAppSettings()
+      .then(() => setWait(false))
+      .catch((err) => setSettingsErr(`${err}`));
+  }, []);
+
+  const handleOpenDialog = async () => {
+    if (!authValue) {
+      await getData();
+      await switchToTreeFolder();
+    }
     setOpenDialog(true);
     setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
     setTreeView(appSettings.UserSettings.Settings.TreeView);
@@ -60,48 +95,55 @@ function App() {
     setSortAZ(appSettings.UserSettings.Settings.SortAZ);
   };
 
-  const localSetupHeader = () => {
+  const switchToSetupPage = () => {
     setHeader(appSettings.UserSettings.Setup.Header);
     setVisibleAuth(false);
     setVisibleLocalSetup(true);
     setVisibleSettings(false);
     setVisibleSupport(false);
     setVisibleTreeFolder(false);
+    setVisibleAppBar(true);
   };
-  const settingsHeader = () => {
+  const switchToSettingsPage = () => {
     setHeader(appSettings.UserSettings.Settings.Header);
     setVisibleAuth(false);
     setVisibleLocalSetup(false);
     setVisibleSettings(true);
     setVisibleSupport(false);
     setVisibleTreeFolder(false);
+    setVisibleAppBar(true);
   };
-  const supportHeader = () => {
+  const switchToSupportPage = () => {
     setHeader(appSettings.UserSettings.Help.Header);
     setVisibleAuth(false);
     setVisibleLocalSetup(false);
     setVisibleSettings(false);
     setVisibleSupport(true);
     setVisibleTreeFolder(false);
+    setVisibleAppBar(true);
+  };
+
+  const switchToTreeFolder = () => {
+    setHeader("Список баз");
+    setVisibleAuth(false);
+    setVisibleLocalSetup(false);
+    setVisibleSettings(false);
+    setVisibleSupport(false);
+    setVisibleTreeFolder(true);
+    setVisibleAppBar(true);
   };
 
   const undoPage = () => {
     if (visibleTreeFolder === false) {
-      setVisibleAuth(false);
-      setVisibleLocalSetup(false);
-      setVisibleSettings(false);
-      setVisibleSupport(false);
-      setVisibleTreeFolder(true);
-      setHeader("Запуск баз");
+      switchToTreeFolder();
     } else {
-      setVisibleAuth(true);
+      setVisibleAuth(false);
       setVisibleLocalSetup(false);
       setVisibleSettings(false);
       setVisibleSupport(false);
       setVisibleTreeFolder(false);
       setVisibleAppBar(false);
       setOpenDialog(false);
-      setHeader("Запуск баз");
     }
   };
 
@@ -112,13 +154,13 @@ function App() {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, ml: 1.5 }}>
           {header}
         </Typography>
-        <IconButton component="label" onClick={localSetupHeader}>
+        <IconButton component="label" onClick={switchToSetupPage}>
           <InstallDesktopIcon />
         </IconButton>
-        <IconButton component="label" onClick={settingsHeader}>
+        <IconButton component="label" onClick={switchToSettingsPage}>
           <SettingsIcon />
         </IconButton>
-        <IconButton component="label" onClick={supportHeader}>
+        <IconButton component="label" onClick={switchToSupportPage}>
           <HelpIcon />
         </IconButton>
         <IconButton component="label" onClick={undoPage}>
@@ -132,16 +174,16 @@ function App() {
     <DataContext.Provider
       value={{
         data,
-        setVisibleTreeFolder,
-        setVisibleAuth,
-        setVisibleAppBar,
+        authValue,
         appSettings,
         setData,
         undoPage,
         openInNew,
         setOpenInNew,
-        localSetupHeader,
+        switchToSetupPage,
+        switchToTreeFolder,
         treeView,
+        setAppSettings,
         setTreeView,
         lastSelect,
         setLastSelect,
@@ -165,16 +207,20 @@ function App() {
         >
           <Button
             variant="contained"
-            onClick={() => {
-              handleOpenDialog();
-            }}
+            onClick={() => handleOpenDialog()}
             disabled={wait}
           >
-            Нажми
+            {String(settingsErr).includes("Failed to fetch")
+              ? "Ошибка"
+              : "Открыть"}
           </Button>
         </Box>
         <Dialog open={openDialog} PaperComponent={PaperComponent}>
-          <Box sx={{ height: 500, width: 530, boxShadow: 1 }}>
+          <Box
+            height={visibleAuth ? 300 : 500}
+            width={530}
+            sx={{ boxShadow: 1 }}
+          >
             <Box sx={{ flexGrow: 1 }}>{visibleAppBar ? appBar : null}</Box>
             {visibleAuth ? <AuthPage /> : null}
             {visibleTreeFolder ? <TreeFolderPage /> : null}

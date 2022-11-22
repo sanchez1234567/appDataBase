@@ -6,20 +6,14 @@ import Item from "./item.js";
 import { useData } from "./App.js";
 
 export default function AuthPage() {
-  const { setVisibleTreeFolder } = useData();
-  const { setVisibleAuth } = useData();
-  const { setVisibleAppBar } = useData();
-  const { appSettings } = useData();
+  //const { appSettings } = useData();
   const { setData } = useData();
-
-  const renderTreeFolderPage = () => {
-    setVisibleTreeFolder(true);
-    setVisibleAuth(false);
-    setVisibleAppBar(true);
-  };
+  const { setAppSettings } = useData();
+  const { switchToTreeFolder } = useData();
 
   const [userName, setUserName] = useState("");
   const [userPassword, setUserPassword] = useState("");
+  const [userSettings, setUserSettings] = useState();
   const [status, setStatus] = useState();
 
   let userData = {
@@ -27,18 +21,44 @@ export default function AuthPage() {
     password: `${userPassword}`,
   };
 
-  const getFetchStatus = async () => {
-    const response = await fetch(appSettings.AppSettings.v8i, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
+  const getUserSettings = async () => {
+    const responseUserSettings = await fetch(
+      `http://localhost:5000/${userData.user}Settings`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      }
+    );
+    setStatus(responseUserSettings.status);
+    const resultUserSettings = await responseUserSettings.json();
+    setUserSettings(resultUserSettings);
+    setAppSettings(resultUserSettings);
+  };
 
-    const result = await response.text();
-    setStatus(response.status);
-    setData(result);
+  const getUserData = async () => {
+    if (userSettings.AppSettings.v8i) {
+      const responseUserData = await fetch(userSettings.AppSettings.v8i, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      setStatus(responseUserData.status);
+      const resultUserData = await responseUserData.text();
+      setData(resultUserData);
+    }
+  };
+
+  const openTree = async () => {
+    await getUserData();
+    if (status) {
+      switchToTreeFolder();
+    }
   };
 
   const getUserName = (e) => {
@@ -50,20 +70,17 @@ export default function AuthPage() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, mt: 5 }}>
+    <Box sx={{ flexGrow: 1, mt: 3 }}>
       <Grid item align={"center"}>
         <Item sx={{ boxShadow: 0 }}>
-          <Typography variant="h5">Выполните вход</Typography>
-        </Item>
-      </Grid>
-      <Grid item mt={1} align={"center"}>
-        <Item sx={{ boxShadow: 0 }}>
-          <Typography variant="h8">
-            {status === 401 ? "Проверьте имя пользователя или пароль" : " "}
+          <Typography variant="h6">
+            {status === 401
+              ? "Проверьте имя пользователя или пароль"
+              : "Выполните вход"}
           </Typography>
         </Item>
       </Grid>
-      <Grid item mt={3} align={"center"}>
+      <Grid item mt={0} align={"center"}>
         <Item sx={{ boxShadow: 0 }}>
           <Stack sx={{ width: "100%" }} spacing={2}>
             <TextField
@@ -91,10 +108,8 @@ export default function AuthPage() {
               variant="contained"
               size="medium"
               fullWidth={true}
-              onClick={() => {
-                getFetchStatus();
-              }}
-              sx={{ borderRadius: 1 }}
+              onClick={getUserSettings}
+              sx={{ borderRadius: 0 }}
               disabled={
                 userName.length > 0 && userPassword.length > 0 ? false : true
               }
@@ -109,8 +124,8 @@ export default function AuthPage() {
               variant="contained"
               size="medium"
               fullWidth={true}
-              onClick={renderTreeFolderPage}
-              sx={{ borderRadius: 1 }}
+              onClick={openTree}
+              sx={{ borderRadius: 0 }}
               disabled={status === 200 ? false : true}
             >
               Войти

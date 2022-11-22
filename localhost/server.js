@@ -37,7 +37,7 @@ server.on("request", (req, res) => {
   if (pathName === "/") {
     ext = ".json";
     //pathName = "/data.json";
-    pathName = "/testData.v8i";
+    pathName = "/defaultData.v8i";
   } else if (!ext) {
     ext = ".json";
     pathName += ext;
@@ -48,7 +48,7 @@ server.on("request", (req, res) => {
     return;
   }
 
-  if (parsedUrl.pathname !== "/") {
+  if (parsedUrl.pathname === "/defaultSettings" || parsedUrl.pathname === "/") {
     const filePath = path.join(process.cwd(), "/public", pathName);
     fs.exists(filePath, function (exist, err) {
       if (!exist || !mimeTypes[ext]) {
@@ -63,7 +63,7 @@ server.on("request", (req, res) => {
       fileStream.pipe(res);
     });
   }
-  if (parsedUrl.pathname === "/") {
+  if (parsedUrl.pathname !== "/" && parsedUrl.pathname !== "/defaultSettings") {
     const body = [];
     req.on("data", (chunk) => {
       body.push(chunk);
@@ -77,7 +77,10 @@ server.on("request", (req, res) => {
       //console.log(parsedData);
       //res.end();
 
-      if (parsedData.user === "admin" && parsedData.password === "admin") {
+      if (
+        (parsedData.user === "admin" && parsedData.password === "admin") ||
+        (parsedData.user === "user" && parsedData.password === "user")
+      ) {
         const filePath = path.join(process.cwd(), "/public", pathName);
         fs.exists(filePath, function (exist, err) {
           if (!exist || !mimeTypes[ext]) {

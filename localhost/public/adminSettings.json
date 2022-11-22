@@ -1,0 +1,46 @@
+{
+  "AppSettings": {
+    "v8i": "http://localhost:5000/adminData",
+    "auth": true,
+    "WidgetType": {
+      "icon": true,
+      "dialog": false
+    }
+  },
+  "UserSettings": {
+    "Settings": {
+      "Header": "Настройки",
+      "OpenInNew": true,
+      "TreeView": false,
+      "LastSelect": [false, ""],
+      "SortAZ": false
+    },
+    "Help": {
+      "Header": "Помощь/Поддержка",
+      "tel": "+7 888 888 88 88",
+      "email": "mail@site.ru",
+      "site": "https://www.site.ru",
+      "HelpMessage": {
+        "method": "POST",
+        "address": "https://www.site.ru/helpMessage"
+      }
+    },
+    "Setup": {
+      "Header": "Локальная установка",
+      "Pages": [
+        {
+          "Title": "Скачивание",
+          "PageTextAddress": "https://jsonplaceholder.typicode.com/posts"
+        },
+        {
+          "Title": "Установка",
+          "PageText": "https://jsonplaceholder.typicode.com/posts/1"
+        },
+        {
+          "Title": "Готово",
+          "PageText": "https://jsonplaceholder.typicode.com/posts/1/comments"
+        }
+      ]
+    }
+  }
+}

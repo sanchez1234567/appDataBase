@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { Switch, Grid } from "@mui/material";
 import Item from "./item.js";
@@ -13,29 +13,43 @@ export default function SettingsPage() {
 
   const { setOpenInNew } = useData();
   const { openInNew } = useData();
+  const [localOpenInNew, setLocalOpenInNew] = useState(openInNew);
   const switchOpenInNew = (event) => {
-    setOpenInNew(event.target.checked);
+    setLocalOpenInNew(event.target.checked);
   };
 
   const { setTreeView } = useData();
   const { treeView } = useData();
+  const [localTreeView, setLocalTreeView] = useState(treeView);
   const switchTreeView = (event) => {
-    setTreeView(event.target.checked);
+    setLocalTreeView(event.target.checked);
   };
 
   const { setLastSelect } = useData();
   const { lastSelect } = useData();
+  const [localLastSelect, setLocalLastSelect] = useState(lastSelect);
   const switchLastSelect = (event) => {
-    setLastSelect(event.target.checked);
+    setLocalLastSelect(event.target.checked);
   };
 
   const { setSortAZ } = useData();
   const { sortAZ } = useData();
+  const [localSortAZ, setLocalSortAZ] = useState(sortAZ);
   const switchSortAZ = (event) => {
-    setSortAZ(event.target.checked);
+    setLocalSortAZ(event.target.checked);
+  };
+
+  const [cancelButton, setCancelButton] = useState("Отмена");
+  const saveSwitchValues = () => {
+    setOpenInNew(localOpenInNew);
+    setTreeView(localTreeView);
+    setLastSelect(localLastSelect);
+    setSortAZ(localSortAZ);
+    setCancelButton("Назад");
   };
 
   const { undoPage } = useData();
+  const { authValue } = useData();
 
   const renderLine = (icon, text, marTop, switchValue, handleSwitch) => {
     return (
@@ -77,28 +91,28 @@ export default function SettingsPage() {
           <OpenInNewIcon />,
           "Открыть в новой вкладке",
           4,
-          openInNew,
+          localOpenInNew,
           switchOpenInNew
         )}
         {renderLine(
           <FormatListBulletedIcon />,
           "Отображать в виде списка",
           0,
-          treeView,
+          localTreeView,
           switchTreeView
         )}
         {renderLine(
           <DoneIcon />,
           "Запомнить последний выбор",
           0,
-          lastSelect,
+          localLastSelect,
           switchLastSelect
         )}
         {renderLine(
           <SortByAlphaIcon />,
           "Сортировка по имени",
           0,
-          sortAZ,
+          localSortAZ,
           switchSortAZ
         )}
       </Box>
@@ -114,6 +128,8 @@ export default function SettingsPage() {
                 size="medium"
                 fullWidth={true}
                 sx={{ borderRadius: 0 }}
+                onClick={saveSwitchValues}
+                disabled={authValue ? false : true}
               >
                 Сохранить
               </Button>
@@ -128,7 +144,7 @@ export default function SettingsPage() {
                 onClick={undoPage}
                 sx={{ borderRadius: 0 }}
               >
-                Отменить
+                {cancelButton}
               </Button>
             </Item>
           </Grid>

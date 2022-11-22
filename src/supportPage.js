@@ -8,6 +8,7 @@ import { useData } from "./App.js";
 
 export default function SupportPage() {
   const { appSettings } = useData();
+  const { authValue } = useData();
 
   return (
     <Box mt={2} ml={2} mr={2}>
@@ -72,6 +73,7 @@ export default function SupportPage() {
               size="medium"
               fullWidth={true}
               sx={{ borderRadius: 0 }}
+              disabled={authValue ? false : true}
             >
               отправить
             </Button>
