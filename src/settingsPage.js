@@ -9,10 +9,12 @@ import SortByAlphaIcon from "@mui/icons-material/SortByAlpha";
 import { useData } from "./App.js";
 
 export default function SettingsPage() {
-  //const { appSettings } = useData();
-
   const { setOpenInNew } = useData();
   const { openInNew } = useData();
+  const { appSettings } = useData();
+  const { userName } = useData();
+  const { selectedNodes } = useData();
+
   const [localOpenInNew, setLocalOpenInNew] = useState(openInNew);
   const switchOpenInNew = (event) => {
     setLocalOpenInNew(event.target.checked);
@@ -40,16 +42,25 @@ export default function SettingsPage() {
   };
 
   const [cancelButton, setCancelButton] = useState("Отмена");
-  const saveSwitchValues = () => {
-    setOpenInNew(localOpenInNew);
-    setTreeView(localTreeView);
-    setLastSelect(localLastSelect);
-    setSortAZ(localSortAZ);
-    setCancelButton("Назад");
+  const saveSwitchValues = async () => {
+    await setOpenInNew(localOpenInNew);
+    appSettings.UserSettings.Settings.OpenInNew = localOpenInNew;
+    await setTreeView(localTreeView);
+    appSettings.UserSettings.Settings.TreeView = localTreeView;
+    await setLastSelect(localLastSelect);
+    appSettings.UserSettings.Settings.LastSelect["0"] = localLastSelect;
+    appSettings.UserSettings.Settings.LastSelect["1"] = selectedNodes;
+    await setSortAZ(localSortAZ);
+    appSettings.UserSettings.Settings.SortAZ = localSortAZ;
+    await localStorage.setItem(
+      `${userName}Settings`,
+      JSON.stringify(appSettings)
+    );
+    await setCancelButton("Назад");
   };
 
   const { undoPage } = useData();
-  const { authValue } = useData();
+  const { auth } = useData();
 
   const renderLine = (icon, text, marTop, switchValue, handleSwitch) => {
     return (
@@ -129,7 +140,7 @@ export default function SettingsPage() {
                 fullWidth={true}
                 sx={{ borderRadius: 0 }}
                 onClick={saveSwitchValues}
-                disabled={authValue ? false : true}
+                disabled={auth ? false : true}
               >
                 Сохранить
               </Button>

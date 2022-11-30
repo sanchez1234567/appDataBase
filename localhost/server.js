@@ -78,8 +78,8 @@ server.on("request", (req, res) => {
       //res.end();
 
       if (
-        (parsedData.user === "admin" && parsedData.password === "admin") ||
-        (parsedData.user === "user" && parsedData.password === "user")
+        (parsedData.name === "admin" && parsedData.password === "admin") ||
+        (parsedData.name === "user" && parsedData.password === "user")
       ) {
         const filePath = path.join(process.cwd(), "/public", pathName);
         fs.exists(filePath, function (exist, err) {

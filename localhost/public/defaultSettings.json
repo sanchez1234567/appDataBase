@@ -1,7 +1,7 @@
 {
   "AppSettings": {
     "v8i": "http://localhost:5000/",
-    "auth": false,
+    "auth": true,
     "WidgetType": {
       "icon": true,
       "dialog": false
@@ -10,10 +10,10 @@
   "UserSettings": {
     "Settings": {
       "Header": "Настройки",
-      "OpenInNew": true,
-      "TreeView": true,
+      "OpenInNew": false,
+      "TreeView": false,
       "LastSelect": [false, ""],
-      "SortAZ": true
+      "SortAZ": false
     },
     "Help": {
       "Header": "Помощь/Поддержка",

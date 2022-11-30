@@ -1,6 +1,6 @@
 import "./App.css";
 import React, { useState, useContext, useEffect } from "react";
-import { CssBaseline, Box, Dialog, Button } from "@mui/material";
+import { CssBaseline, Box, Dialog, Button, Alert } from "@mui/material";
 import { Typography, AppBar, Toolbar, IconButton } from "@mui/material";
 import Paper, { PaperProps } from "@mui/material/Paper";
 import InstallDesktopIcon from "@mui/icons-material/InstallDesktop";
@@ -25,15 +25,15 @@ function PaperComponent(props: PaperProps) {
 function App() {
   const [appSettings, setAppSettings] = useState([]);
   const [wait, setWait] = useState(true);
-  const [authValue, setAuthValue] = useState();
-  const [settingsErr, setSettingsErr] = useState();
-  const [dataErr, setDataErr] = useState();
+  const [auth, setAuth] = useState(false);
 
   const [data, setData] = useState([]);
+  const [userName, setUserName] = useState("");
+  const [userPassword, setUserPassword] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [header, setHeader] = useState("Список баз");
 
-  const [visibleAuth, setVisibleAuth] = useState();
+  const [visibleAuth, setVisibleAuth] = useState(false);
   const [visibleTreeFolder, setVisibleTreeFolder] = useState(false);
   const [visibleLocalSetup, setVisibleLocalSetup] = useState(false);
   const [visibleSettings, setVisibleSettings] = useState(false);
@@ -43,21 +43,42 @@ function App() {
   const [openInNew, setOpenInNew] = useState();
   const [treeView, setTreeView] = useState();
   const [lastSelect, setLastSelect] = useState();
-  const [selectedNodes, setSelectedNodes] = useState();
+  const [selectedNodes, setSelectedNodes] = useState("");
   const [sortAZ, setSortAZ] = useState();
 
   const getAppSettings = async () => {
-    const responseSettings = await fetch(
-      "http://localhost:5000/defaultSettings"
-    );
-    if (responseSettings.ok) {
-      const resultSettings = await responseSettings.json();
-      setAppSettings(resultSettings);
-      setAuthValue(resultSettings.AppSettings.auth);
-      setVisibleAuth(resultSettings.AppSettings.auth);
+    const responseAppSet = await fetch("http://localhost:5000/defaultSettings");
+    if (responseAppSet.ok) {
+      const resultAppSet = await responseAppSet.json();
+      await setAppSettings(resultAppSet);
+      await setAuth(resultAppSet.AppSettings.auth);
+      await localStorage.setItem(
+        "defaultAppSettings",
+        JSON.stringify(resultAppSet)
+      );
+      await setWait(false);
     }
-    if (!responseSettings.ok) {
-      throw new Error("Failed to fetch");
+    if (!responseAppSet.ok && responseAppSet.status === 404) {
+      throw new Error("404");
+    }
+  };
+
+  const handleErrSettings = (fetchErr) => {
+    if (String(fetchErr).includes("Failed to fetch")) {
+      if (localStorage.getItem("defaultAppSettings") === null) {
+        setServerErr(true);
+      }
+      if (localStorage.getItem("defaultAppSettings") !== null) {
+        const localSettings = JSON.parse(
+          localStorage.getItem("defaultAppSettings")
+        );
+        setAppSettings(localSettings);
+        setAuth(localSettings.AppSettings.auth);
+        setWait(false);
+      }
+    }
+    if (String(fetchErr).includes("404")) {
+      setSettingsErr(true);
     }
   };
 
@@ -66,33 +87,63 @@ function App() {
       const responseData = await fetch(appSettings.AppSettings.v8i);
       if (responseData.ok) {
         const resultData = await responseData.text();
-        setData(resultData);
+        await setData(resultData);
+        await localStorage.setItem("defaultData", resultData);
+        await setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
+        await setTreeView(appSettings.UserSettings.Settings.TreeView);
+        await setLastSelect(appSettings.UserSettings.Settings.LastSelect[0]);
+        await setSelectedNodes(appSettings.UserSettings.Settings.LastSelect[1]);
+        await setSortAZ(appSettings.UserSettings.Settings.SortAZ);
+        await setOpenDialog(true);
+        await switchToTreeFolder();
       }
-      if (!responseData.ok || responseData.status === 404) {
-        throw new Error("Failed to fetch");
+      if (!responseData.ok && responseData.status === 404) {
+        throw new Error("404");
       }
     } catch (err) {
-      setDataErr(`${err}`);
+      handleErrData(err);
+    }
+  };
+
+  const handleErrData = async (fetchDataErr) => {
+    if (String(fetchDataErr).includes("Failed to fetch")) {
+      if (localStorage.getItem("defaultData") === null) {
+        setServerErr(true);
+      }
+      if (localStorage.getItem("defaultData") !== null && !auth) {
+        await setData(localStorage.getItem("defaultData"));
+        await setOpenDialog(true);
+        await switchToTreeFolder();
+        await setHeader("Список баз (не в сети)");
+        await setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
+        await setTreeView(appSettings.UserSettings.Settings.TreeView);
+        await setLastSelect(appSettings.UserSettings.Settings.LastSelect[0]);
+        await setSelectedNodes(appSettings.UserSettings.Settings.LastSelect[1]);
+        await setSortAZ(appSettings.UserSettings.Settings.SortAZ);
+      }
+    }
+    if (String(fetchDataErr).includes("404")) {
+      setDataErr(true);
     }
   };
 
   useEffect(() => {
-    getAppSettings()
-      .then(() => setWait(false))
-      .catch((err) => setSettingsErr(`${err}`));
+    getAppSettings().catch((err) => handleErrSettings(err));
   }, []);
 
-  const handleOpenDialog = async () => {
-    if (!authValue) {
-      await getData();
-      await switchToTreeFolder();
+  const handleOpenDialog = () => {
+    if (!auth) {
+      getData();
     }
-    setOpenDialog(true);
-    setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
-    setTreeView(appSettings.UserSettings.Settings.TreeView);
-    setLastSelect(appSettings.UserSettings.Settings.LastSelect[0]);
-    setSelectedNodes(appSettings.UserSettings.Settings.LastSelect[1]);
-    setSortAZ(appSettings.UserSettings.Settings.SortAZ);
+    if (auth) {
+      setOpenDialog(true);
+      setVisibleAuth(true);
+      setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
+      setTreeView(appSettings.UserSettings.Settings.TreeView);
+      setLastSelect(appSettings.UserSettings.Settings.LastSelect[0]);
+      setSelectedNodes(appSettings.UserSettings.Settings.LastSelect[1]);
+      setSortAZ(appSettings.UserSettings.Settings.SortAZ);
+    }
   };
 
   const switchToSetupPage = () => {
@@ -147,6 +198,44 @@ function App() {
     }
   };
 
+  const [serverErr, setServerErr] = useState(false);
+  const [settingsErr, setSettingsErr] = useState(false);
+  const [dataErr, setDataErr] = useState(false);
+
+  const renderButton = () => {
+    if (serverErr) {
+      return (
+        <Alert severity="error">
+          Сервер не отвечает. Свяжитесь с поддержкой
+        </Alert>
+      );
+    }
+    if (settingsErr) {
+      return (
+        <Alert severity="error">
+          Файл настроек не найден. Свяжитесь с поддержкой
+        </Alert>
+      );
+    }
+    if (dataErr) {
+      return (
+        <Alert severity="error">
+          Список баз не найден. Свяжитесь с поддержкой
+        </Alert>
+      );
+    } else {
+      return (
+        <Button
+          variant="contained"
+          onClick={() => handleOpenDialog()}
+          disabled={wait}
+        >
+          Открыть
+        </Button>
+      );
+    }
+  };
+
   let appBar = (
     <AppBar position="static">
       <Toolbar>
@@ -174,7 +263,11 @@ function App() {
     <DataContext.Provider
       value={{
         data,
-        authValue,
+        userName,
+        userPassword,
+        setUserName,
+        setUserPassword,
+        auth,
         appSettings,
         setData,
         undoPage,
@@ -191,6 +284,12 @@ function App() {
         setSelectedNodes,
         sortAZ,
         setSortAZ,
+        setVisibleAuth,
+        setOpenDialog,
+        setServerErr,
+        setSettingsErr,
+        setDataErr,
+        setHeader,
       }}
     >
       <React.Fragment>
@@ -205,15 +304,7 @@ function App() {
             mx: "auto",
           }}
         >
-          <Button
-            variant="contained"
-            onClick={() => handleOpenDialog()}
-            disabled={wait}
-          >
-            {String(settingsErr).includes("Failed to fetch")
-              ? "Ошибка"
-              : "Открыть"}
-          </Button>
+          {renderButton()}
         </Box>
         <Dialog open={openDialog} PaperComponent={PaperComponent}>
           <Box

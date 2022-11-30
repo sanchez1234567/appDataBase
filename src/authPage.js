@@ -6,58 +6,147 @@ import Item from "./item.js";
 import { useData } from "./App.js";
 
 export default function AuthPage() {
-  //const { appSettings } = useData();
+  const { appSettings } = useData();
   const { setData } = useData();
+  const { userName } = useData();
+  const { setUserName } = useData();
+  const { userPassword } = useData();
+  const { setUserPassword } = useData();
   const { setAppSettings } = useData();
   const { switchToTreeFolder } = useData();
+  const { setVisibleAuth } = useData();
+  const { setOpenDialog } = useData();
+  const { setServerErr } = useData();
+  const { setSettingsErr } = useData();
+  const { setDataErr } = useData();
+  const { setHeader } = useData();
+  const { setOpenInNew } = useData();
+  const { setTreeView } = useData();
+  const { setLastSelect } = useData();
+  const { setSelectedNodes } = useData();
+  const { setSortAZ } = useData();
 
-  const [userName, setUserName] = useState("");
-  const [userPassword, setUserPassword] = useState("");
-  const [userSettings, setUserSettings] = useState();
-  const [status, setStatus] = useState();
+  const [title, setTitle] = useState("Выполните вход");
 
-  let userData = {
-    user: `${userName}`,
+  let user = {
+    name: `${userName}`,
     password: `${userPassword}`,
   };
 
   const getUserSettings = async () => {
-    const responseUserSettings = await fetch(
-      `http://localhost:5000/${userData.user}Settings`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
+    try {
+      const responseUserSettings = await fetch(
+        `http://localhost:5000/${user.name}Settings`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(user),
+        }
+      );
+      if (responseUserSettings.ok) {
+        const resultUserSettings = await responseUserSettings.json();
+        await setAppSettings(resultUserSettings);
+        await localStorage.setItem(
+          `${user.name}Settings`,
+          JSON.stringify(resultUserSettings)
+        );
+        await setOpenInNew(resultUserSettings.UserSettings.Settings.OpenInNew);
+        await setTreeView(resultUserSettings.UserSettings.Settings.TreeView);
+        await setLastSelect(
+          resultUserSettings.UserSettings.Settings.LastSelect[0]
+        );
+        await setSelectedNodes(
+          resultUserSettings.UserSettings.Settings.LastSelect[1]
+        );
+        await setSortAZ(resultUserSettings.UserSettings.Settings.SortAZ);
+        await getUserData();
       }
-    );
-    setStatus(responseUserSettings.status);
-    const resultUserSettings = await responseUserSettings.json();
-    setUserSettings(resultUserSettings);
-    setAppSettings(resultUserSettings);
-  };
-
-  const getUserData = async () => {
-    if (userSettings.AppSettings.v8i) {
-      const responseUserData = await fetch(userSettings.AppSettings.v8i, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-
-      setStatus(responseUserData.status);
-      const resultUserData = await responseUserData.text();
-      setData(resultUserData);
+      if (!responseUserSettings.ok && responseUserSettings.status === 404) {
+        throw new Error("404");
+      }
+      if (!responseUserSettings.ok && responseUserSettings.status === 401) {
+        throw new Error("401");
+      }
+    } catch (err) {
+      handleErrSet(err);
     }
   };
 
-  const openTree = async () => {
-    await getUserData();
-    if (status) {
-      switchToTreeFolder();
+  const handleErrSet = async (fetchUserSet) => {
+    if (String(fetchUserSet).includes("Failed to fetch")) {
+      if (localStorage.getItem(`${user.name}Settings`) === null) {
+        setVisibleAuth(false);
+        setOpenDialog(false);
+        setServerErr(true);
+      }
+      if (localStorage.getItem(`${user.name}Settings`) !== null) {
+        await setAppSettings(
+          JSON.parse(localStorage.getItem(`${user.name}Settings`))
+        );
+        await getUserData();
+      }
+    }
+    if (String(fetchUserSet).includes("401")) {
+      setTitle("Неверное имя пользователя или пароль");
+    }
+    if (String(fetchUserSet).includes("404")) {
+      setVisibleAuth(false);
+      setOpenDialog(false);
+      setSettingsErr(true);
+    }
+  };
+
+  const getUserData = async () => {
+    try {
+      const responseUserData = await fetch(appSettings.AppSettings.v8i, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+      if (responseUserData.ok) {
+        const resultUserData = await responseUserData.text();
+        await setData(resultUserData);
+        await localStorage.setItem(`${user.name}Data`, resultUserData);
+        await switchToTreeFolder();
+      }
+      if (!responseUserData.ok && responseUserData.status === 404) {
+        throw new Error("404");
+      }
+      if (!responseUserData.ok && responseUserData.status === 401) {
+        throw new Error("401");
+      }
+    } catch (err) {
+      handleErrData(err);
+    }
+  };
+
+  const handleErrData = async (fetchUserData) => {
+    if (String(fetchUserData).includes("Failed to fetch")) {
+      if (localStorage.getItem(`${user.name}Data`) === null) {
+        await setVisibleAuth(false);
+        await setOpenDialog(false);
+        await setServerErr(true);
+      }
+      if (localStorage.getItem(`${user.name}Data`) !== null) {
+        await setData(localStorage.getItem(`${user.name}Data`));
+        console.log(appSettings);
+        await setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
+        await setTreeView(appSettings.UserSettings.Settings.TreeView);
+        await switchToTreeFolder();
+        await setHeader("Список баз (не в сети)");
+      }
+    }
+    if (String(fetchUserData).includes("401")) {
+      setTitle("Неверное имя пользователя или пароль");
+    }
+    if (String(fetchUserData).includes("404")) {
+      await setVisibleAuth(false);
+      await setOpenDialog(false);
+      await setDataErr(true);
     }
   };
 
@@ -73,11 +162,7 @@ export default function AuthPage() {
     <Box sx={{ flexGrow: 1, mt: 3 }}>
       <Grid item align={"center"}>
         <Item sx={{ boxShadow: 0 }}>
-          <Typography variant="h6">
-            {status === 401
-              ? "Проверьте имя пользователя или пароль"
-              : "Выполните вход"}
-          </Typography>
+          <Typography variant="h6">{title}</Typography>
         </Item>
       </Grid>
       <Grid item mt={0} align={"center"}>
@@ -102,6 +187,9 @@ export default function AuthPage() {
             <FormControlLabel control={<CheckBox />} label="Запомнить меня" />
           </Item>
         </Grid>
+        <Grid item xs={2}>
+          <Item sx={{ boxShadow: 0 }}></Item>
+        </Grid>
         <Grid item xs={3}>
           <Item sx={{ boxShadow: 0 }}>
             <Button
@@ -113,20 +201,6 @@ export default function AuthPage() {
               disabled={
                 userName.length > 0 && userPassword.length > 0 ? false : true
               }
-            >
-              Проверка
-            </Button>
-          </Item>
-        </Grid>
-        <Grid item xs={3}>
-          <Item sx={{ boxShadow: 0 }}>
-            <Button
-              variant="contained"
-              size="medium"
-              fullWidth={true}
-              onClick={openTree}
-              sx={{ borderRadius: 0 }}
-              disabled={status === 200 ? false : true}
             >
               Войти
             </Button>
