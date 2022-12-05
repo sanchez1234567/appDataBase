@@ -1,4 +1,3 @@
-import "./App.css";
 import React, { useState, useContext, useEffect } from "react";
 import { CssBaseline, Box, Dialog, Button, Alert } from "@mui/material";
 import { Typography, AppBar, Toolbar, IconButton } from "@mui/material";
@@ -9,11 +8,12 @@ import HelpIcon from "@mui/icons-material/Help";
 import GridViewIcon from "@mui/icons-material/GridView";
 import CancelIcon from "@mui/icons-material/Cancel";
 import UndoIcon from "@mui/icons-material/Undo";
-import TreeFolderPage from "./treeFolderPage.js";
-import AuthPage from "./authPage.js";
-import LocalSetupPage from "./localSetupPage.js";
-import SettingsPage from "./settingsPage.js";
-import SupportPage from "./supportPage.js";
+import TreeFolderPage from "./TreeFolderPage.js";
+import AuthPage from "./AuthPage.js";
+import LocalSetupPage from "./LocalSetupPage.js";
+import SettingsPage from "./SettingsPage.js";
+import SupportPage from "./SupportPage.js";
+import RepeatSendNewSettings from "./functions/RepeatSendNewSettings.js";
 
 const DataContext = React.createContext();
 const useData = () => useContext(DataContext);
@@ -31,7 +31,7 @@ function App() {
   const [userName, setUserName] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
-  const [header, setHeader] = useState("Список баз");
+  const [header, setHeader] = useState("");
 
   const [visibleAuth, setVisibleAuth] = useState(false);
   const [visibleTreeFolder, setVisibleTreeFolder] = useState(false);
@@ -40,11 +40,11 @@ function App() {
   const [visibleSupport, setVisibleSupport] = useState(false);
   const [visibleAppBar, setVisibleAppBar] = useState(false);
 
-  const [openInNew, setOpenInNew] = useState();
-  const [treeView, setTreeView] = useState();
-  const [lastSelect, setLastSelect] = useState();
+  const [openInNew, setOpenInNew] = useState(false);
+  const [treeView, setTreeView] = useState(false);
+  const [lastSelect, setLastSelect] = useState(false);
   const [selectedNodes, setSelectedNodes] = useState("");
-  const [sortAZ, setSortAZ] = useState();
+  const [sortAZ, setSortAZ] = useState(false);
 
   const getAppSettings = async () => {
     const responseAppSet = await fetch("http://localhost:5000/defaultSettings");
@@ -114,7 +114,6 @@ function App() {
         await setData(localStorage.getItem("defaultData"));
         await setOpenDialog(true);
         await switchToTreeFolder();
-        await setHeader("Список баз (не в сети)");
         await setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
         await setTreeView(appSettings.UserSettings.Settings.TreeView);
         await setLastSelect(appSettings.UserSettings.Settings.LastSelect[0]);
@@ -131,13 +130,14 @@ function App() {
     getAppSettings().catch((err) => handleErrSettings(err));
   }, []);
 
-  const handleOpenDialog = () => {
+  const handleOpenDialog = async () => {
     if (!auth) {
       getData();
     }
     if (auth) {
-      setOpenDialog(true);
-      setVisibleAuth(true);
+      await RepeatSendNewSettings();
+      await setOpenDialog(true);
+      await setVisibleAuth(true);
       setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
       setTreeView(appSettings.UserSettings.Settings.TreeView);
       setLastSelect(appSettings.UserSettings.Settings.LastSelect[0]);
@@ -174,7 +174,7 @@ function App() {
     setVisibleAppBar(true);
   };
 
-  const switchToTreeFolder = () => {
+  const switchToTreeFolder = async () => {
     setHeader("Список баз");
     setVisibleAuth(false);
     setVisibleLocalSetup(false);

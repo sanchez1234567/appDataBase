@@ -4,9 +4,9 @@ import FolderIcon from "@mui/icons-material/Folder";
 import ComputerIcon from "@mui/icons-material/Computer";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import InstallDesktopIcon from "@mui/icons-material/InstallDesktop";
-import SortAZ from "./sortAZ.js";
+import SortAZ from "./SortAZ.js";
 
-export default function BuildList(response, openUrl, openSetup, sortAZValue) {
+export default function BuildTree(response, openUrl, openSetup, sortAZValue) {
   const lineText = response.split(/\r?\n/);
 
   let dataObj = {
@@ -80,15 +80,27 @@ export default function BuildList(response, openUrl, openSetup, sortAZValue) {
     }
   }
 
-  for (let obj = 0; obj < flatArr.length; obj += 1) {
-    if (flatArr[obj].connect === "Folder") {
-      flatArr.splice(obj, 1);
-    }
-  }
-
   sortAZValue
     ? (dataObj.children = SortAZ(flatArr))
     : (dataObj.children = flatArr);
+
+  let treeArr = [];
+
+  for (let obj of flatArr) {
+    if (obj.folder === "/") {
+      treeArr.push(obj);
+    } else {
+      let folderArr = obj.folder.slice(1).split("/");
+      let findObj = flatArr.find((item) =>
+        item.name.includes(folderArr[folderArr.length - 1])
+      );
+
+      findObj.children.push(obj);
+      findObj.icon = <FolderIcon />;
+    }
+  }
+
+  dataObj.children = treeArr;
 
   return dataObj;
 }

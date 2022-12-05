@@ -3,10 +3,10 @@ import { TreeView, TreeItem } from "@mui/lab";
 import { Typography, Box, Grid, Link } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import Item from "./item.js";
+import Item from "./Item.js";
 import { useData } from "./App.js";
-import BuildTree from "./buildTree.js";
-import BuildList from "./buildList.js";
+import BuildTree from "./functions/BuildTree.js";
+import BuildList from "./functions/BuildList.js";
 
 export default function TreeFolderPage() {
   const [folder, setFolder] = useState("Folder");
@@ -35,6 +35,7 @@ export default function TreeFolderPage() {
   const handleSelect = (event, nodeIds) => {
     setSelectedNodes(nodeIds);
   };
+  console.log(selectedNodes);
 
   const { switchToSetupPage } = useData();
 
@@ -99,7 +100,7 @@ export default function TreeFolderPage() {
         >
           <TreeView
             selected={lastSelect ? selectedNodes : null}
-            onNodeSelect={lastSelect ? handleSelect : null}
+            // onNodeSelect={handleSelect}
             aria-label="rich object"
             defaultCollapseIcon={<ExpandMoreIcon />}
             defaultExpanded={["root"]}

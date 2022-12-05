@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Typography, Box, Grid, Stack, TextField, Button } from "@mui/material";
 import { FormControlLabel } from "@mui/material";
 import CheckBox from "@mui/material/CheckBox";
-import Item from "./item.js";
+import Item from "./Item.js";
 import { useData } from "./App.js";
 
 export default function AuthPage() {
@@ -29,8 +29,8 @@ export default function AuthPage() {
   const [title, setTitle] = useState("Выполните вход");
 
   let user = {
-    name: `${userName}`,
-    password: `${userPassword}`,
+    name: userName,
+    password: userPassword,
   };
 
   const getUserSettings = async () => {
@@ -70,11 +70,11 @@ export default function AuthPage() {
         throw new Error("401");
       }
     } catch (err) {
-      handleErrSet(err);
+      handleErrSettings(err);
     }
   };
 
-  const handleErrSet = async (fetchUserSet) => {
+  const handleErrSettings = async (fetchUserSet) => {
     if (String(fetchUserSet).includes("Failed to fetch")) {
       if (localStorage.getItem(`${user.name}Settings`) === null) {
         setVisibleAuth(false);
@@ -132,12 +132,16 @@ export default function AuthPage() {
         await setServerErr(true);
       }
       if (localStorage.getItem(`${user.name}Data`) !== null) {
-        await setData(localStorage.getItem(`${user.name}Data`));
-        console.log(appSettings);
+        // эта часть кода не выолняется
         await setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
         await setTreeView(appSettings.UserSettings.Settings.TreeView);
+        await setLastSelect(appSettings.UserSettings.Settings.LastSelect[0]);
+        await setSelectedNodes(appSettings.UserSettings.Settings.LastSelect[1]);
+        await setSortAZ(appSettings.UserSettings.Settings.SortAZ);
+        // до этой строчки
+        await setData(localStorage.getItem(`${user.name}Data`));
         await switchToTreeFolder();
-        await setHeader("Список баз (не в сети)");
+        await setHeader("Список баз");
       }
     }
     if (String(fetchUserData).includes("401")) {

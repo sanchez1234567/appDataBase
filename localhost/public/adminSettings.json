@@ -11,9 +11,12 @@
     "Settings": {
       "Header": "Настройки",
       "OpenInNew": true,
-      "TreeView": false,
-      "LastSelect": [false, ""],
-      "SortAZ": false
+      "TreeView": true,
+      "LastSelect": [
+        true,
+        ""
+      ],
+      "SortAZ": true
     },
     "Help": {
       "Header": "Помощь/Поддержка",

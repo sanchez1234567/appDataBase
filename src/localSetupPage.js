@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Stepper, Step, StepLabel } from "@mui/material";
 import { Button, Grid } from "@mui/material";
-import Item from "./item.js";
+import Item from "./Item.js";
 import { useData } from "./App.js";
 
 export default function LocalSetupPage() {

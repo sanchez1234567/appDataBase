@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { Switch, Grid } from "@mui/material";
-import Item from "./item.js";
+import Item from "./Item.js";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import DoneIcon from "@mui/icons-material/Done";
@@ -13,6 +13,7 @@ export default function SettingsPage() {
   const { openInNew } = useData();
   const { appSettings } = useData();
   const { userName } = useData();
+  const { userPassword } = useData();
   const { selectedNodes } = useData();
 
   const [localOpenInNew, setLocalOpenInNew] = useState(openInNew);
@@ -41,6 +42,42 @@ export default function SettingsPage() {
     setLocalSortAZ(event.target.checked);
   };
 
+  let newSettings = {
+    name: userName,
+    password: userPassword,
+    settings: appSettings,
+  };
+
+  const sendNewSettings = async () => {
+    try {
+      await fetch(`http://localhost:5000/${newSettings.name}Settings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newSettings),
+      });
+    } catch (err) {
+      handleErrSend(err);
+    }
+  };
+
+  const handleErrSend = (failed) => {
+    if (String(failed).includes("Failed to fetch")) {
+      if (localStorage.getItem("filesArr")) {
+        let existArr = JSON.parse(localStorage.getItem("filesArr")).concat(
+          newSettings
+        );
+        localStorage.setItem("filesArr", JSON.stringify(existArr));
+      }
+      if (!localStorage.getItem("filesArr")) {
+        let filesArr = [];
+        filesArr.push(newSettings);
+        localStorage.setItem("filesArr", JSON.stringify(filesArr));
+      }
+    }
+  };
+
   const [cancelButton, setCancelButton] = useState("Отмена");
   const saveSwitchValues = async () => {
     await setOpenInNew(localOpenInNew);
@@ -57,6 +94,7 @@ export default function SettingsPage() {
       JSON.stringify(appSettings)
     );
     await setCancelButton("Назад");
+    await sendNewSettings();
   };
 
   const { undoPage } = useData();

@@ -78,6 +78,35 @@ server.on("request", (req, res) => {
       //res.end();
 
       if (
+        parsedData.name === "admin" &&
+        parsedData.password === "admin" &&
+        parsedData.settings
+      ) {
+        fs.writeFile(
+          "./public/adminSettings.json",
+          JSON.stringify(parsedData.settings, null, 2),
+          "utf-8",
+          function (err) {
+            if (err) return console.log(err);
+          }
+        );
+      }
+      if (
+        parsedData.name === "user" &&
+        parsedData.password === "user" &&
+        parsedData.settings
+      ) {
+        fs.writeFile(
+          "./public/userSettings.json",
+          JSON.stringify(parsedData.settings, null, 2),
+          "utf-8",
+          function (err) {
+            if (err) return console.log(err);
+          }
+        );
+      }
+
+      if (
         (parsedData.name === "admin" && parsedData.password === "admin") ||
         (parsedData.name === "user" && parsedData.password === "user")
       ) {

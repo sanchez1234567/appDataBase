@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Grid, Typography, Button, TextField } from "@mui/material";
-import Item from "./item.js";
+import Item from "./Item.js";
 import CallIcon from "@mui/icons-material/Call";
 import EmailIcon from "@mui/icons-material/Email";
 import LanguageIcon from "@mui/icons-material/Language";
