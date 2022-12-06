@@ -10,10 +10,10 @@
   "UserSettings": {
     "Settings": {
       "Header": "Настройки",
-      "OpenInNew": true,
-      "TreeView": true,
+      "OpenInNew": false,
+      "TreeView": false,
       "LastSelect": [
-        true,
+        false,
         ""
       ],
       "SortAZ": true

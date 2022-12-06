@@ -11,7 +11,7 @@
     "Settings": {
       "Header": "Настройки",
       "OpenInNew": true,
-      "TreeView": true,
+      "TreeView": false,
       "LastSelect": [
         false,
         ""

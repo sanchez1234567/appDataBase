@@ -89,11 +89,6 @@ function App() {
         const resultData = await responseData.text();
         await setData(resultData);
         await localStorage.setItem("defaultData", resultData);
-        await setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
-        await setTreeView(appSettings.UserSettings.Settings.TreeView);
-        await setLastSelect(appSettings.UserSettings.Settings.LastSelect[0]);
-        await setSelectedNodes(appSettings.UserSettings.Settings.LastSelect[1]);
-        await setSortAZ(appSettings.UserSettings.Settings.SortAZ);
         await setOpenDialog(true);
         await switchToTreeFolder();
       }
@@ -114,11 +109,6 @@ function App() {
         await setData(localStorage.getItem("defaultData"));
         await setOpenDialog(true);
         await switchToTreeFolder();
-        await setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
-        await setTreeView(appSettings.UserSettings.Settings.TreeView);
-        await setLastSelect(appSettings.UserSettings.Settings.LastSelect[0]);
-        await setSelectedNodes(appSettings.UserSettings.Settings.LastSelect[1]);
-        await setSortAZ(appSettings.UserSettings.Settings.SortAZ);
       }
     }
     if (String(fetchDataErr).includes("404")) {
@@ -138,11 +128,6 @@ function App() {
       await RepeatSendNewSettings();
       await setOpenDialog(true);
       await setVisibleAuth(true);
-      setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
-      setTreeView(appSettings.UserSettings.Settings.TreeView);
-      setLastSelect(appSettings.UserSettings.Settings.LastSelect[0]);
-      setSelectedNodes(appSettings.UserSettings.Settings.LastSelect[1]);
-      setSortAZ(appSettings.UserSettings.Settings.SortAZ);
     }
   };
 

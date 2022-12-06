@@ -132,6 +132,7 @@ export default function AuthPage() {
         await setServerErr(true);
       }
       if (localStorage.getItem(`${user.name}Data`) !== null) {
+        await console.log(appSettings);
         // эта часть кода не выолняется
         await setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
         await setTreeView(appSettings.UserSettings.Settings.TreeView);

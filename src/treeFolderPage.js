@@ -35,7 +35,6 @@ export default function TreeFolderPage() {
   const handleSelect = (event, nodeIds) => {
     setSelectedNodes(nodeIds);
   };
-  console.log(selectedNodes);
 
   const { switchToSetupPage } = useData();
 

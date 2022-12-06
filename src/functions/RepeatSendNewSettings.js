@@ -10,14 +10,25 @@ export default async function RepeatSendNewSettings() {
           password: arr[obj]["password"],
           settings: arr[obj]["settings"],
         };
-        await fetch(`http://localhost:5000/${settings.name}Settings`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(settings),
-        });
-        cnt += 1;
+        try {
+          const sendSettings = await fetch(
+            `http://localhost:5000/${settings.name}Settings`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(settings),
+            }
+          );
+          if (sendSettings.ok) {
+            cnt += 1;
+          }
+        } catch (err) {
+          if (String(err).includes("Failed to fetch")) {
+            return;
+          }
+        }
       }
       if (cnt === arr.length) {
         localStorage.setItem("filesArr", JSON.stringify([]));
