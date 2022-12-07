@@ -45,6 +45,8 @@ function App() {
   const [lastSelect, setLastSelect] = useState(false);
   const [selectedNodes, setSelectedNodes] = useState("");
   const [sortAZ, setSortAZ] = useState(false);
+  console.log(selectedNodes);
+  console.log(appSettings);
 
   const getAppSettings = async () => {
     const responseAppSet = await fetch("http://localhost:5000/defaultSettings");
@@ -139,6 +141,9 @@ function App() {
     setVisibleSupport(false);
     setVisibleTreeFolder(false);
     setVisibleAppBar(true);
+    if (lastSelect) {
+      console.log("send last select");
+    }
   };
   const switchToSettingsPage = () => {
     setHeader(appSettings.UserSettings.Settings.Header);
@@ -173,6 +178,9 @@ function App() {
     if (visibleTreeFolder === false) {
       switchToTreeFolder();
     } else {
+      if (lastSelect && openInNew) {
+        console.log("send last select");
+      }
       setVisibleAuth(false);
       setVisibleLocalSetup(false);
       setVisibleSettings(false);

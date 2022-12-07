@@ -10,13 +10,13 @@
   "UserSettings": {
     "Settings": {
       "Header": "Настройки",
-      "OpenInNew": false,
-      "TreeView": false,
+      "OpenInNew": true,
+      "TreeView": true,
       "LastSelect": [
         false,
-        ""
+        "dd09725a-fafe-42bf-b053-101fb6e572e2"
       ],
-      "SortAZ": true
+      "SortAZ": false
     },
     "Help": {
       "Header": "Помощь/Поддержка",

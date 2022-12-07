@@ -6,7 +6,13 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import InstallDesktopIcon from "@mui/icons-material/InstallDesktop";
 import SortAZ from "./SortAZ.js";
 
-export default function BuildTree(response, openUrl, openSetup, sortAZValue) {
+export default function HandlingData(
+  response,
+  openUrl,
+  openSetup,
+  sortAZValue,
+  list
+) {
   const lineText = response.split(/\r?\n/);
 
   let dataObj = {
@@ -20,12 +26,13 @@ export default function BuildTree(response, openUrl, openSetup, sortAZValue) {
   };
 
   let flatArr = [];
-  let id = 1;
+  //let id = 1;
   let newID = -1;
   for (let index = 0; index < lineText.length; index += 1) {
     if (lineText[index].includes("[")) {
       newID = flatArr.push({
-        id: id,
+        //id: id,
+        id: "",
         name: lineText[index].slice(1, lineText[index].length - 1),
         folder: "",
         children: [],
@@ -35,6 +42,9 @@ export default function BuildTree(response, openUrl, openSetup, sortAZValue) {
       });
 
       for (let subindex = index; subindex < lineText.length; subindex += 1) {
+        if (lineText[subindex].includes("ID")) {
+          flatArr[newID - 1].id = lineText[subindex].slice(3);
+        }
         if (lineText[subindex].includes("Folder")) {
           flatArr[newID - 1].folder = lineText[subindex].slice(7);
           break;
@@ -76,31 +86,44 @@ export default function BuildTree(response, openUrl, openSetup, sortAZValue) {
           );
         }
       }
-      id += 1;
+      //id += 1;
     }
   }
 
-  sortAZValue
-    ? (dataObj.children = SortAZ(flatArr))
-    : (dataObj.children = flatArr);
+  if (!list) {
+    sortAZValue
+      ? (dataObj.children = SortAZ(flatArr))
+      : (dataObj.children = flatArr);
 
-  let treeArr = [];
+    let treeArr = [];
 
-  for (let obj of flatArr) {
-    if (obj.folder === "/") {
-      treeArr.push(obj);
-    } else {
-      let folderArr = obj.folder.slice(1).split("/");
-      let findObj = flatArr.find((item) =>
-        item.name.includes(folderArr[folderArr.length - 1])
-      );
+    for (let obj of flatArr) {
+      if (obj.folder === "/") {
+        treeArr.push(obj);
+      } else {
+        let folderArr = obj.folder.slice(1).split("/");
+        let findObj = flatArr.find((item) =>
+          item.name.includes(folderArr[folderArr.length - 1])
+        );
 
-      findObj.children.push(obj);
-      findObj.icon = <FolderIcon />;
+        findObj.children.push(obj);
+        findObj.icon = <FolderIcon />;
+      }
     }
+
+    dataObj.children = treeArr;
   }
 
-  dataObj.children = treeArr;
+  if (list) {
+    for (let obj = 0; obj < flatArr.length; obj += 1) {
+      if (flatArr[obj].connect === "Folder") {
+        flatArr.splice(obj, 1);
+      }
+    }
+    sortAZValue
+      ? (dataObj.children = SortAZ(flatArr))
+      : (dataObj.children = flatArr);
+  }
 
   return dataObj;
 }

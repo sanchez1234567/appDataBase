@@ -5,38 +5,40 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Item from "./Item.js";
 import { useData } from "./App.js";
-import BuildTree from "./functions/BuildTree.js";
-import BuildList from "./functions/BuildList.js";
+import HandlingData from "./functions/HandlingData.js";
 
 export default function TreeFolderPage() {
+  const { appSettings } = useData();
+  const { treeView } = useData();
+  const { sortAZ } = useData();
+  const { lastSelect } = useData();
+  const { data } = useData();
+  const { openInNew } = useData();
+  const { selectedNodes } = useData();
+  const { setSelectedNodes } = useData();
+  const { switchToSetupPage } = useData();
+
   const [folder, setFolder] = useState("Folder");
   const getNameFolder = (fold) => {
     setFolder(`${fold}`);
   };
 
-  const { data } = useData();
+  const handleSelect = async (event, nodeIds) => {
+    if (event.target.nodeName === "svg") {
+      await setSelectedNodes(String(nodeIds));
+    }
+  };
 
-  const { openInNew } = useData();
-  const openLink = (url) => {
+  const openLink = async (url) => {
     if (openInNew === false) {
-      window.open(`${url}`, "_self");
+      if (lastSelect) {
+        window.open(`${url}`, "_self");
+        console.log("send last select");
+      }
     } else if (openInNew === true) {
       window.open(`${url}`, "_blank");
     }
   };
-
-  const { treeView } = useData();
-
-  const { sortAZ } = useData();
-
-  const { lastSelect } = useData();
-  const { selectedNodes } = useData();
-  const { setSelectedNodes } = useData();
-  const handleSelect = (event, nodeIds) => {
-    setSelectedNodes(nodeIds);
-  };
-
-  const { switchToSetupPage } = useData();
 
   const renderFolder = (folder) => {
     if (folder.includes("https")) {
@@ -99,7 +101,7 @@ export default function TreeFolderPage() {
         >
           <TreeView
             selected={lastSelect ? selectedNodes : null}
-            // onNodeSelect={handleSelect}
+            onNodeSelect={lastSelect ? handleSelect : null}
             aria-label="rich object"
             defaultCollapseIcon={<ExpandMoreIcon />}
             defaultExpanded={["root"]}
@@ -112,9 +114,7 @@ export default function TreeFolderPage() {
             }}
           >
             {renderTree(
-              treeView
-                ? BuildList(data, openLink, switchToSetupPage, sortAZ)
-                : BuildTree(data, openLink, switchToSetupPage, sortAZ)
+              HandlingData(data, openLink, switchToSetupPage, sortAZ, treeView)
             )}
           </TreeView>
         </Item>
