@@ -14,6 +14,7 @@ import LocalSetupPage from "./LocalSetupPage.js";
 import SettingsPage from "./SettingsPage.js";
 import SupportPage from "./SupportPage.js";
 import RepeatSendNewSettings from "./functions/RepeatSendNewSettings.js";
+import SendNewSettings from "./functions/SendNewSettings.js";
 
 const DataContext = React.createContext();
 const useData = () => useContext(DataContext);
@@ -41,24 +42,30 @@ function App() {
   const [visibleAppBar, setVisibleAppBar] = useState(false);
 
   const [openInNew, setOpenInNew] = useState(false);
-  const [treeView, setTreeView] = useState(false);
+  const [treeView, setTreeView] = useState(true);
   const [lastSelect, setLastSelect] = useState(false);
   const [selectedNodes, setSelectedNodes] = useState("");
   const [sortAZ, setSortAZ] = useState(false);
-  console.log(selectedNodes);
-  console.log(appSettings);
+
+  let currentUser = {
+    name: userName,
+    password: userPassword,
+  };
+
+  let currentUserSet = {
+    name: userName,
+    password: userPassword,
+    settings: appSettings,
+  };
 
   const getAppSettings = async () => {
     const responseAppSet = await fetch("http://localhost:5000/defaultSettings");
     if (responseAppSet.ok) {
       const resultAppSet = await responseAppSet.json();
-      await setAppSettings(resultAppSet);
-      await setAuth(resultAppSet.AppSettings.auth);
-      await localStorage.setItem(
-        "defaultAppSettings",
-        JSON.stringify(resultAppSet)
-      );
-      await setWait(false);
+      setAppSettings(resultAppSet);
+      setAuth(resultAppSet.AppSettings.auth);
+      localStorage.setItem("defaultAppSettings", JSON.stringify(resultAppSet));
+      setWait(false);
     }
     if (!responseAppSet.ok && responseAppSet.status === 404) {
       throw new Error("404");
@@ -89,10 +96,10 @@ function App() {
       const responseData = await fetch(appSettings.AppSettings.v8i);
       if (responseData.ok) {
         const resultData = await responseData.text();
-        await setData(resultData);
-        await localStorage.setItem("defaultData", resultData);
-        await setOpenDialog(true);
-        await switchToTreeFolder();
+        setData(resultData);
+        localStorage.setItem("defaultData", resultData);
+        setOpenDialog(true);
+        switchToTreeFolder();
       }
       if (!responseData.ok && responseData.status === 404) {
         throw new Error("404");
@@ -108,9 +115,9 @@ function App() {
         setServerErr(true);
       }
       if (localStorage.getItem("defaultData") !== null && !auth) {
-        await setData(localStorage.getItem("defaultData"));
-        await setOpenDialog(true);
-        await switchToTreeFolder();
+        setData(localStorage.getItem("defaultData"));
+        setOpenDialog(true);
+        switchToTreeFolder();
       }
     }
     if (String(fetchDataErr).includes("404")) {
@@ -122,14 +129,14 @@ function App() {
     getAppSettings().catch((err) => handleErrSettings(err));
   }, []);
 
-  const handleOpenDialog = async () => {
+  const handleOpenDialog = () => {
     if (!auth) {
       getData();
     }
     if (auth) {
-      await RepeatSendNewSettings();
-      await setOpenDialog(true);
-      await setVisibleAuth(true);
+      RepeatSendNewSettings();
+      setOpenDialog(true);
+      setVisibleAuth(true);
     }
   };
 
@@ -141,9 +148,6 @@ function App() {
     setVisibleSupport(false);
     setVisibleTreeFolder(false);
     setVisibleAppBar(true);
-    if (lastSelect) {
-      console.log("send last select");
-    }
   };
   const switchToSettingsPage = () => {
     setHeader(appSettings.UserSettings.Settings.Header);
@@ -180,6 +184,7 @@ function App() {
     } else {
       if (lastSelect && openInNew) {
         console.log("send last select");
+        SendNewSettings(currentUserSet);
       }
       setVisibleAuth(false);
       setVisibleLocalSetup(false);
@@ -256,6 +261,8 @@ function App() {
     <DataContext.Provider
       value={{
         data,
+        currentUser,
+        currentUserSet,
         userName,
         userPassword,
         setUserName,

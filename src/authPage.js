@@ -6,11 +6,8 @@ import Item from "./Item.js";
 import { useData } from "./App.js";
 
 export default function AuthPage() {
-  const { appSettings } = useData();
   const { setData } = useData();
-  const { userName } = useData();
   const { setUserName } = useData();
-  const { userPassword } = useData();
   const { setUserPassword } = useData();
   const { setAppSettings } = useData();
   const { switchToTreeFolder } = useData();
@@ -25,43 +22,37 @@ export default function AuthPage() {
   const { setLastSelect } = useData();
   const { setSelectedNodes } = useData();
   const { setSortAZ } = useData();
+  const { currentUser } = useData();
 
   const [title, setTitle] = useState("Выполните вход");
-
-  let user = {
-    name: userName,
-    password: userPassword,
-  };
 
   const getUserSettings = async () => {
     try {
       const responseUserSettings = await fetch(
-        `http://localhost:5000/${user.name}Settings`,
+        `http://localhost:5000/${currentUser.name}Settings`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(user),
+          body: JSON.stringify(currentUser),
         }
       );
       if (responseUserSettings.ok) {
         const resultUserSettings = await responseUserSettings.json();
-        await setAppSettings(resultUserSettings);
-        await localStorage.setItem(
-          `${user.name}Settings`,
+        localStorage.setItem(
+          `${currentUser.name}/${currentUser.password}Settings`,
           JSON.stringify(resultUserSettings)
         );
-        await setOpenInNew(resultUserSettings.UserSettings.Settings.OpenInNew);
-        await setTreeView(resultUserSettings.UserSettings.Settings.TreeView);
-        await setLastSelect(
-          resultUserSettings.UserSettings.Settings.LastSelect[0]
-        );
-        await setSelectedNodes(
+        setAppSettings(resultUserSettings);
+        setOpenInNew(resultUserSettings.UserSettings.Settings.OpenInNew);
+        setTreeView(resultUserSettings.UserSettings.Settings.TreeView);
+        setLastSelect(resultUserSettings.UserSettings.Settings.LastSelect[0]);
+        setSelectedNodes(
           resultUserSettings.UserSettings.Settings.LastSelect[1]
         );
-        await setSortAZ(resultUserSettings.UserSettings.Settings.SortAZ);
-        await getUserData();
+        setSortAZ(resultUserSettings.UserSettings.Settings.SortAZ);
+        getUserData(resultUserSettings);
       }
       if (!responseUserSettings.ok && responseUserSettings.status === 404) {
         throw new Error("404");
@@ -74,44 +65,55 @@ export default function AuthPage() {
     }
   };
 
-  const handleErrSettings = async (fetchUserSet) => {
-    if (String(fetchUserSet).includes("Failed to fetch")) {
-      if (localStorage.getItem(`${user.name}Settings`) === null) {
+  const handleErrSettings = async (errUserSet) => {
+    if (String(errUserSet).includes("Failed to fetch")) {
+      if (
+        localStorage.getItem(
+          `${currentUser.name}/${currentUser.password}Settings`
+        ) === null
+      ) {
         setVisibleAuth(false);
         setOpenDialog(false);
         setServerErr(true);
       }
-      if (localStorage.getItem(`${user.name}Settings`) !== null) {
-        await setAppSettings(
-          JSON.parse(localStorage.getItem(`${user.name}Settings`))
+      if (
+        localStorage.getItem(
+          `${currentUser.name}/${currentUser.password}Settings`
+        ) !== null
+      ) {
+        const localUserSettings = await JSON.parse(
+          localStorage.getItem(
+            `${currentUser.name}/${currentUser.password}Settings`
+          )
         );
-        await getUserData();
+        setAppSettings(localUserSettings);
+        getUserData(localUserSettings);
       }
     }
-    if (String(fetchUserSet).includes("401")) {
+    if (String(errUserSet).includes("401")) {
       setTitle("Неверное имя пользователя или пароль");
     }
-    if (String(fetchUserSet).includes("404")) {
+    if (String(errUserSet).includes("404")) {
       setVisibleAuth(false);
       setOpenDialog(false);
       setSettingsErr(true);
     }
   };
 
-  const getUserData = async () => {
+  const getUserData = async (userSet) => {
     try {
-      const responseUserData = await fetch(appSettings.AppSettings.v8i, {
+      const responseUserData = await fetch(userSet.AppSettings.v8i, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(user),
+        body: JSON.stringify(currentUser),
       });
       if (responseUserData.ok) {
         const resultUserData = await responseUserData.text();
-        await setData(resultUserData);
-        await localStorage.setItem(`${user.name}Data`, resultUserData);
-        await switchToTreeFolder();
+        setData(resultUserData);
+        localStorage.setItem(`${currentUser.name}Data`, resultUserData);
+        switchToTreeFolder();
       }
       if (!responseUserData.ok && responseUserData.status === 404) {
         throw new Error("404");
@@ -120,38 +122,35 @@ export default function AuthPage() {
         throw new Error("401");
       }
     } catch (err) {
-      handleErrData(err);
+      handleErrData(err, userSet);
     }
   };
 
-  const handleErrData = async (fetchUserData) => {
-    if (String(fetchUserData).includes("Failed to fetch")) {
-      if (localStorage.getItem(`${user.name}Data`) === null) {
-        await setVisibleAuth(false);
-        await setOpenDialog(false);
-        await setServerErr(true);
+  const handleErrData = (errUserData, localUserSet) => {
+    if (String(errUserData).includes("Failed to fetch")) {
+      if (localStorage.getItem(`${currentUser.name}Data`) === null) {
+        setVisibleAuth(false);
+        setOpenDialog(false);
+        setServerErr(true);
       }
-      if (localStorage.getItem(`${user.name}Data`) !== null) {
-        await console.log(appSettings);
-        // эта часть кода не выолняется
-        await setOpenInNew(appSettings.UserSettings.Settings.OpenInNew);
-        await setTreeView(appSettings.UserSettings.Settings.TreeView);
-        await setLastSelect(appSettings.UserSettings.Settings.LastSelect[0]);
-        await setSelectedNodes(appSettings.UserSettings.Settings.LastSelect[1]);
-        await setSortAZ(appSettings.UserSettings.Settings.SortAZ);
-        // до этой строчки
-        await setData(localStorage.getItem(`${user.name}Data`));
-        await switchToTreeFolder();
-        await setHeader("Список баз");
+      if (localStorage.getItem(`${currentUser.name}Data`) !== null) {
+        setOpenInNew(localUserSet.UserSettings.Settings.OpenInNew);
+        setTreeView(localUserSet.UserSettings.Settings.TreeView);
+        setLastSelect(localUserSet.UserSettings.Settings.LastSelect[0]);
+        setSelectedNodes(localUserSet.UserSettings.Settings.LastSelect[1]);
+        setSortAZ(localUserSet.UserSettings.Settings.SortAZ);
+        setData(localStorage.getItem(`${currentUser.name}Data`));
+        switchToTreeFolder();
+        setHeader("Список баз");
       }
     }
-    if (String(fetchUserData).includes("401")) {
+    if (String(errUserData).includes("401")) {
       setTitle("Неверное имя пользователя или пароль");
     }
-    if (String(fetchUserData).includes("404")) {
-      await setVisibleAuth(false);
-      await setOpenDialog(false);
-      await setDataErr(true);
+    if (String(errUserData).includes("404")) {
+      setVisibleAuth(false);
+      setOpenDialog(false);
+      setDataErr(true);
     }
   };
 
@@ -204,7 +203,10 @@ export default function AuthPage() {
               onClick={getUserSettings}
               sx={{ borderRadius: 0 }}
               disabled={
-                userName.length > 0 && userPassword.length > 0 ? false : true
+                currentUser["name"].length > 0 &&
+                currentUser["password"].length > 0
+                  ? false
+                  : true
               }
             >
               Войти

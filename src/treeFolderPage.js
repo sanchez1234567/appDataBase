@@ -6,6 +6,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Item from "./Item.js";
 import { useData } from "./App.js";
 import HandlingData from "./functions/HandlingData.js";
+import SendNewSettings from "./functions/SendNewSettings.js";
 
 export default function TreeFolderPage() {
   const { appSettings } = useData();
@@ -17,24 +18,26 @@ export default function TreeFolderPage() {
   const { selectedNodes } = useData();
   const { setSelectedNodes } = useData();
   const { switchToSetupPage } = useData();
+  const { currentUserSet } = useData();
 
   const [folder, setFolder] = useState("Folder");
   const getNameFolder = (fold) => {
     setFolder(`${fold}`);
   };
 
-  const handleSelect = async (event, nodeIds) => {
+  const handleSelect = (event, nodeIds) => {
     if (event.target.nodeName === "svg") {
-      await setSelectedNodes(String(nodeIds));
+      setSelectedNodes(String(nodeIds));
+      appSettings.UserSettings.Settings.LastSelect["1"] = nodeIds;
+      if (lastSelect && !openInNew) {
+        SendNewSettings(currentUserSet);
+      }
     }
   };
 
   const openLink = async (url) => {
     if (openInNew === false) {
-      if (lastSelect) {
-        window.open(`${url}`, "_self");
-        console.log("send last select");
-      }
+      window.open(`${url}`, "_self");
     } else if (openInNew === true) {
       window.open(`${url}`, "_blank");
     }
