@@ -7,6 +7,7 @@ import { useData } from "./App.js";
 
 export default function AuthPage() {
   const { setData } = useData();
+  const { userName } = useData();
   const { setUserName } = useData();
   const { setUserPassword } = useData();
   const { setAppSettings } = useData();
@@ -23,6 +24,8 @@ export default function AuthPage() {
   const { setSelectedNodes } = useData();
   const { setSortAZ } = useData();
   const { currentUser } = useData();
+  const { setStatus } = useData();
+  const { setIsOnline } = useData();
 
   const [title, setTitle] = useState("Выполните вход");
 
@@ -113,6 +116,8 @@ export default function AuthPage() {
         const resultUserData = await responseUserData.text();
         setData(resultUserData);
         localStorage.setItem(`${currentUser.name}Data`, resultUserData);
+        setStatus(`${userName} (онлайн)`);
+        setIsOnline(true);
         switchToTreeFolder();
       }
       if (!responseUserData.ok && responseUserData.status === 404) {
@@ -140,6 +145,8 @@ export default function AuthPage() {
         setSelectedNodes(localUserSet.UserSettings.Settings.LastSelect[1]);
         setSortAZ(localUserSet.UserSettings.Settings.SortAZ);
         setData(localStorage.getItem(`${currentUser.name}Data`));
+        setStatus(`${userName} (оффлайн)`);
+        setIsOnline(false);
         switchToTreeFolder();
         setHeader("Список баз");
       }

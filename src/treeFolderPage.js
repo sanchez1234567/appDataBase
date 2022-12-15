@@ -29,9 +29,7 @@ export default function TreeFolderPage() {
     if (event.target.nodeName === "svg") {
       setSelectedNodes(String(nodeIds));
       appSettings.UserSettings.Settings.LastSelect["1"] = nodeIds;
-      if (lastSelect && !openInNew) {
-        SendNewSettings(currentUserSet);
-      }
+      console.log(nodeIds);
     }
   };
 

@@ -1,11 +1,13 @@
 import React, { useState, useContext, useEffect } from "react";
 import { CssBaseline, Box, Dialog, Button, Alert } from "@mui/material";
 import { Typography, AppBar, Toolbar, IconButton } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import Paper, { PaperProps } from "@mui/material/Paper";
 import InstallDesktopIcon from "@mui/icons-material/InstallDesktop";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HelpIcon from "@mui/icons-material/Help";
-import GridViewIcon from "@mui/icons-material/GridView";
+import LanguageIcon from "@mui/icons-material/Language";
+import ComputerIcon from "@mui/icons-material/Computer";
 import CancelIcon from "@mui/icons-material/Cancel";
 import UndoIcon from "@mui/icons-material/Undo";
 import TreeFolderPage from "./TreeFolderPage.js";
@@ -27,6 +29,8 @@ function App() {
   const [appSettings, setAppSettings] = useState([]);
   const [wait, setWait] = useState(true);
   const [auth, setAuth] = useState(false);
+  const [status, setStatus] = useState("");
+  const [isOnline, setIsOnline] = useState();
 
   const [data, setData] = useState([]);
   const [userName, setUserName] = useState("");
@@ -98,6 +102,8 @@ function App() {
         const resultData = await responseData.text();
         setData(resultData);
         localStorage.setItem("defaultData", resultData);
+        setIsOnline(true);
+        setStatus("онлайн");
         setOpenDialog(true);
         switchToTreeFolder();
       }
@@ -116,6 +122,8 @@ function App() {
       }
       if (localStorage.getItem("defaultData") !== null && !auth) {
         setData(localStorage.getItem("defaultData"));
+        setIsOnline(false);
+        setStatus("оффлайн");
         setOpenDialog(true);
         switchToTreeFolder();
       }
@@ -182,10 +190,6 @@ function App() {
     if (visibleTreeFolder === false) {
       switchToTreeFolder();
     } else {
-      if (lastSelect && openInNew) {
-        console.log("send last select");
-        SendNewSettings(currentUserSet);
-      }
       setVisibleAuth(false);
       setVisibleLocalSetup(false);
       setVisibleSettings(false);
@@ -237,7 +241,9 @@ function App() {
   let appBar = (
     <AppBar position="static">
       <Toolbar>
-        <GridViewIcon />
+        <Tooltip title={status} placement="top">
+          {isOnline ? <LanguageIcon /> : <ComputerIcon />}
+        </Tooltip>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, ml: 1.5 }}>
           {header}
         </Typography>
@@ -290,6 +296,8 @@ function App() {
         setSettingsErr,
         setDataErr,
         setHeader,
+        setStatus,
+        setIsOnline,
       }}
     >
       <React.Fragment>

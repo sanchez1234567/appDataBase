@@ -92,6 +92,34 @@ server.on("request", (req, res) => {
         );
       }
       if (
+        parsedData.name === "admin" &&
+        parsedData.password === "admin" &&
+        parsedData.message
+      ) {
+        fs.writeFile(
+          `./messages/adminMessage${Date.now()}.txt`,
+          JSON.stringify(parsedData.message, null, 2),
+          "utf-8",
+          function (err) {
+            if (err) return console.log(err);
+          }
+        );
+      }
+      if (
+        parsedData.name === "user" &&
+        parsedData.password === "user" &&
+        parsedData.message
+      ) {
+        fs.writeFile(
+          `./messages/userMessage${Date.now()}.txt`,
+          JSON.stringify(parsedData.message, null, 2),
+          "utf-8",
+          function (err) {
+            if (err) return console.log(err);
+          }
+        );
+      }
+      if (
         parsedData.name === "user" &&
         parsedData.password === "user" &&
         parsedData.settings
