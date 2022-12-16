@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { Typography, Box, Grid, Stack, TextField, Button } from "@mui/material";
-import { FormControlLabel } from "@mui/material";
-import CheckBox from "@mui/material/CheckBox";
 import Item from "./Item.js";
 import { useData } from "./App.js";
 
@@ -194,9 +192,7 @@ export default function AuthPage() {
       </Grid>
       <Grid container spacing={1} sx={{ width: "100%" }} mt={2.5}>
         <Grid item xs={6}>
-          <Item sx={{ boxShadow: 0 }}>
-            <FormControlLabel control={<CheckBox />} label="Запомнить меня" />
-          </Item>
+          <Item sx={{ boxShadow: 0 }}></Item>
         </Grid>
         <Grid item xs={2}>
           <Item sx={{ boxShadow: 0 }}></Item>

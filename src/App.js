@@ -190,6 +190,9 @@ function App() {
     if (visibleTreeFolder === false) {
       switchToTreeFolder();
     } else {
+      if (openInNew && lastSelect) {
+        SendNewSettings(currentUserSet);
+      }
       setVisibleAuth(false);
       setVisibleLocalSetup(false);
       setVisibleSettings(false);

@@ -13,9 +13,26 @@ export default async function SendNewSettings(user) {
 
     if (String(failed).includes("Failed to fetch")) {
       if (localStorage.getItem("filesArr")) {
-        let existArr = JSON.parse(localStorage.getItem("filesArr")).concat(
-          currentUser
-        );
+        let existArr = JSON.parse(localStorage.getItem("filesArr"));
+        if (existArr.length === 0) {
+          existArr.push(currentUser);
+        }
+        if (existArr.length !== 0) {
+          let cnt = 0;
+          for (let obj = 0; obj < existArr.length; obj += 1) {
+            if (
+              existArr[obj]["name"] === currentUser.name &&
+              existArr[obj]["password"] === currentUser.password
+            ) {
+              existArr[obj]["settings"] = currentUser.settings;
+              cnt += 1;
+            }
+          }
+          if (cnt === 0) {
+            existArr.push(currentUser);
+            console.log(existArr);
+          }
+        }
         localStorage.setItem("filesArr", JSON.stringify(existArr));
       }
       if (!localStorage.getItem("filesArr")) {

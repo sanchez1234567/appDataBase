@@ -26,10 +26,12 @@ export default function TreeFolderPage() {
   };
 
   const handleSelect = (event, nodeIds) => {
-    if (event.target.nodeName === "svg") {
+    if (event.target.localName === "svg") {
       setSelectedNodes(String(nodeIds));
       appSettings.UserSettings.Settings.LastSelect["1"] = nodeIds;
-      console.log(nodeIds);
+      if (lastSelect && !openInNew) {
+        SendNewSettings(currentUserSet);
+      }
     }
   };
 
