@@ -5,7 +5,6 @@ import { useData } from "./App.js";
 
 export default function AuthPage() {
   const { setData } = useData();
-  const { userName } = useData();
   const { setUserName } = useData();
   const { setUserPassword } = useData();
   const { setAppSettings } = useData();
@@ -19,11 +18,11 @@ export default function AuthPage() {
   const { setOpenInNew } = useData();
   const { setTreeView } = useData();
   const { setLastSelect } = useData();
-  const { setSelectedNodes } = useData();
+  const { setSelectedNode } = useData();
   const { setSortAZ } = useData();
   const { currentUser } = useData();
-  const { setStatus } = useData();
   const { setIsOnline } = useData();
+  const { setIsOnlineIcon } = useData();
 
   const [title, setTitle] = useState("Выполните вход");
 
@@ -49,9 +48,7 @@ export default function AuthPage() {
         setOpenInNew(resultUserSettings.UserSettings.Settings.OpenInNew);
         setTreeView(resultUserSettings.UserSettings.Settings.TreeView);
         setLastSelect(resultUserSettings.UserSettings.Settings.LastSelect[0]);
-        setSelectedNodes(
-          resultUserSettings.UserSettings.Settings.LastSelect[1]
-        );
+        setSelectedNode(resultUserSettings.UserSettings.Settings.LastSelect[1]);
         setSortAZ(resultUserSettings.UserSettings.Settings.SortAZ);
         getUserData(resultUserSettings);
       }
@@ -114,8 +111,8 @@ export default function AuthPage() {
         const resultUserData = await responseUserData.text();
         setData(resultUserData);
         localStorage.setItem(`${currentUser.name}Data`, resultUserData);
-        setStatus(`${userName} (онлайн)`);
-        setIsOnline(true);
+        setIsOnline(`${currentUser.name} (онлайн)`);
+        setIsOnlineIcon(true);
         switchToTreeFolder();
       }
       if (!responseUserData.ok && responseUserData.status === 404) {
@@ -140,11 +137,11 @@ export default function AuthPage() {
         setOpenInNew(localUserSet.UserSettings.Settings.OpenInNew);
         setTreeView(localUserSet.UserSettings.Settings.TreeView);
         setLastSelect(localUserSet.UserSettings.Settings.LastSelect[0]);
-        setSelectedNodes(localUserSet.UserSettings.Settings.LastSelect[1]);
+        setSelectedNode(localUserSet.UserSettings.Settings.LastSelect[1]);
         setSortAZ(localUserSet.UserSettings.Settings.SortAZ);
         setData(localStorage.getItem(`${currentUser.name}Data`));
-        setStatus(`${userName} (оффлайн)`);
-        setIsOnline(false);
+        setIsOnline(`${currentUser.name} (оффлайн)`);
+        setIsOnlineIcon(false);
         switchToTreeFolder();
         setHeader("Список баз");
       }

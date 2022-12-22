@@ -11,7 +11,7 @@ import SendNewSettings from "./functions/SendNewSettings.js";
 
 export default function SettingsPage() {
   const { appSettings } = useData();
-  const { selectedNodes } = useData();
+  const { selectedNode } = useData();
   const { currentUserSet } = useData();
 
   const { setOpenInNew } = useData();
@@ -50,7 +50,7 @@ export default function SettingsPage() {
     appSettings.UserSettings.Settings.TreeView = localTreeView;
     setLastSelect(localLastSelect);
     appSettings.UserSettings.Settings.LastSelect["0"] = localLastSelect;
-    appSettings.UserSettings.Settings.LastSelect["1"] = selectedNodes;
+    appSettings.UserSettings.Settings.LastSelect["1"] = selectedNode;
     setSortAZ(localSortAZ);
     appSettings.UserSettings.Settings.SortAZ = localSortAZ;
     setCancelButton("Назад");

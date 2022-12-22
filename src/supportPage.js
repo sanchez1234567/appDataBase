@@ -20,8 +20,8 @@ export default function SupportPage() {
     message: userMessage,
   };
 
-  const [openSnack, setOpenSnack] = useState();
-  const [messageOk, setMessageOk] = useState();
+  const [openSnack, setOpenSnack] = useState(false);
+  const [messageOk, setMessageOk] = useState("");
   const handleClose = () => {
     setOpenSnack(false);
   };

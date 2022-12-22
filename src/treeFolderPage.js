@@ -15,8 +15,8 @@ export default function TreeFolderPage() {
   const { lastSelect } = useData();
   const { data } = useData();
   const { openInNew } = useData();
-  const { selectedNodes } = useData();
-  const { setSelectedNodes } = useData();
+  const { selectedNode } = useData();
+  const { setSelectedNode } = useData();
   const { switchToSetupPage } = useData();
   const { currentUserSet } = useData();
 
@@ -25,13 +25,49 @@ export default function TreeFolderPage() {
     setFolder(`${fold}`);
   };
 
+  const openSetupLink = (event, urlConnect) => {
+    if (!lastSelect) {
+      if (event.target.localName === "svg") {
+        if (!openInNew && event.target.dataset.testid === "OpenInNewIcon") {
+          window.open(`${urlConnect}`, "_self");
+        }
+        if (openInNew && event.target.dataset.testid === "OpenInNewIcon") {
+          window.open(`${urlConnect}`, "_blank");
+        }
+        if (event.target.dataset.testid === "InstallDesktopIcon") {
+          switchToSetupPage();
+        }
+      }
+    }
+    if (lastSelect) {
+      if (event.target.localName === "svg") {
+        if (!openInNew && event.target.dataset.testid === "OpenInNewIcon") {
+          SendNewSettings(currentUserSet).then(() =>
+            window.open(`${urlConnect}`, "_self")
+          );
+        }
+        if (openInNew && event.target.dataset.testid === "OpenInNewIcon") {
+          window.open(`${urlConnect}`, "_blank");
+        }
+        if (
+          !openInNew &&
+          event.target.dataset.testid === "InstallDesktopIcon"
+        ) {
+          SendNewSettings(currentUserSet).then(() => {
+            switchToSetupPage();
+          });
+        }
+        if (openInNew && event.target.dataset.testid === "InstallDesktopIcon") {
+          switchToSetupPage();
+        }
+      }
+    }
+  };
+
   const handleSelect = (event, nodeIds) => {
     if (event.target.localName === "svg") {
-      setSelectedNodes(String(nodeIds));
+      setSelectedNode(String(nodeIds));
       appSettings.UserSettings.Settings.LastSelect["1"] = nodeIds;
-      if (lastSelect && !openInNew) {
-        SendNewSettings(currentUserSet);
-      }
     }
   };
 
@@ -43,15 +79,11 @@ export default function TreeFolderPage() {
     }
   };
 
-  const renderFolder = (folder) => {
-    if (folder.includes("https")) {
+  const renderFolder = (f) => {
+    if (f.includes("https")) {
       return (
-        <Link
-          component="button"
-          variant="body1"
-          onClick={() => openLink(folder)}
-        >
-          {folder}
+        <Link component="button" variant="body1" onClick={() => openLink(f)}>
+          {f}
         </Link>
       );
     } else {
@@ -80,7 +112,10 @@ export default function TreeFolderPage() {
             </Box>
           </Box>
         }
-        onClick={() => getNameFolder(nodes.connect)}
+        onClick={(event) => {
+          getNameFolder(nodes.connect);
+          openSetupLink(event, nodes.connect);
+        }}
         sx={{ mt: 0.5, "&& .Mui-selected": { backgroundColor: "#6ab7ff" } }}
       >
         {Array.isArray(nodes.children)
@@ -103,7 +138,7 @@ export default function TreeFolderPage() {
           }}
         >
           <TreeView
-            selected={lastSelect ? selectedNodes : null}
+            selected={lastSelect ? selectedNode : null}
             onNodeSelect={lastSelect ? handleSelect : null}
             aria-label="rich object"
             defaultCollapseIcon={<ExpandMoreIcon />}
@@ -116,9 +151,7 @@ export default function TreeFolderPage() {
               overflowY: "auto",
             }}
           >
-            {renderTree(
-              HandlingData(data, openLink, switchToSetupPage, sortAZ, treeView)
-            )}
+            {renderTree(HandlingData(data, sortAZ, treeView))}
           </TreeView>
         </Item>
       </Grid>

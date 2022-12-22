@@ -1,7 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
-import { CssBaseline, Box, Dialog, Button, Alert } from "@mui/material";
+import { CssBaseline, Box, Dialog, Alert } from "@mui/material";
 import { Typography, AppBar, Toolbar, IconButton } from "@mui/material";
 import { Tooltip } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 import Paper, { PaperProps } from "@mui/material/Paper";
 import InstallDesktopIcon from "@mui/icons-material/InstallDesktop";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -27,17 +28,18 @@ function PaperComponent(props: PaperProps) {
 
 function App() {
   const [appSettings, setAppSettings] = useState([]);
+  const [loadingStatus, setLoadingStatus] = useState(true);
   const [wait, setWait] = useState(true);
   const [auth, setAuth] = useState(false);
-  const [status, setStatus] = useState("");
-  const [isOnline, setIsOnline] = useState();
+  const [isOnline, setIsOnline] = useState("");
+  const [isOnlineIcon, setIsOnlineIcon] = useState([]);
 
   const [data, setData] = useState([]);
   const [userName, setUserName] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
-  const [header, setHeader] = useState("");
 
+  const [header, setHeader] = useState("");
   const [visibleAuth, setVisibleAuth] = useState(false);
   const [visibleTreeFolder, setVisibleTreeFolder] = useState(false);
   const [visibleLocalSetup, setVisibleLocalSetup] = useState(false);
@@ -48,7 +50,7 @@ function App() {
   const [openInNew, setOpenInNew] = useState(false);
   const [treeView, setTreeView] = useState(true);
   const [lastSelect, setLastSelect] = useState(false);
-  const [selectedNodes, setSelectedNodes] = useState("");
+  const [selectedNode, setSelectedNode] = useState("");
   const [sortAZ, setSortAZ] = useState(false);
 
   let currentUser = {
@@ -69,6 +71,7 @@ function App() {
       setAppSettings(resultAppSet);
       setAuth(resultAppSet.AppSettings.auth);
       localStorage.setItem("defaultAppSettings", JSON.stringify(resultAppSet));
+      setLoadingStatus(false);
       setWait(false);
     }
     if (!responseAppSet.ok && responseAppSet.status === 404) {
@@ -87,6 +90,7 @@ function App() {
         );
         setAppSettings(localSettings);
         setAuth(localSettings.AppSettings.auth);
+        setLoadingStatus(false);
         setWait(false);
       }
     }
@@ -94,6 +98,10 @@ function App() {
       setSettingsErr(true);
     }
   };
+
+  useEffect(() => {
+    getAppSettings().catch((err) => handleErrSettings(err));
+  }, []);
 
   const getData = async () => {
     try {
@@ -103,7 +111,7 @@ function App() {
         setData(resultData);
         localStorage.setItem("defaultData", resultData);
         setIsOnline(true);
-        setStatus("онлайн");
+        setIsOnline("онлайн");
         setOpenDialog(true);
         switchToTreeFolder();
       }
@@ -123,7 +131,7 @@ function App() {
       if (localStorage.getItem("defaultData") !== null && !auth) {
         setData(localStorage.getItem("defaultData"));
         setIsOnline(false);
-        setStatus("оффлайн");
+        setIsOnline("оффлайн");
         setOpenDialog(true);
         switchToTreeFolder();
       }
@@ -132,10 +140,6 @@ function App() {
       setDataErr(true);
     }
   };
-
-  useEffect(() => {
-    getAppSettings().catch((err) => handleErrSettings(err));
-  }, []);
 
   const handleOpenDialog = () => {
     if (!auth) {
@@ -186,20 +190,38 @@ function App() {
     setVisibleAppBar(true);
   };
 
+  const closeApp = () => {
+    setVisibleAuth(false);
+    setVisibleLocalSetup(false);
+    setVisibleSettings(false);
+    setVisibleSupport(false);
+    setVisibleTreeFolder(false);
+    setVisibleAppBar(false);
+    setOpenDialog(false);
+  };
+
   const undoPage = () => {
-    if (visibleTreeFolder === false) {
-      switchToTreeFolder();
-    } else {
-      if (openInNew && lastSelect) {
-        SendNewSettings(currentUserSet);
+    if (!lastSelect) {
+      if (visibleTreeFolder === false) {
+        switchToTreeFolder();
+      } else {
+        closeApp();
       }
-      setVisibleAuth(false);
-      setVisibleLocalSetup(false);
-      setVisibleSettings(false);
-      setVisibleSupport(false);
-      setVisibleTreeFolder(false);
-      setVisibleAppBar(false);
-      setOpenDialog(false);
+    }
+    if (lastSelect) {
+      if (openInNew)
+        if (visibleTreeFolder === false) {
+          switchToTreeFolder();
+        } else {
+          SendNewSettings(currentUserSet).then(closeApp);
+        }
+      if (!openInNew) {
+        if (visibleTreeFolder === false) {
+          switchToTreeFolder();
+        } else {
+          closeApp();
+        }
+      }
     }
   };
 
@@ -230,13 +252,14 @@ function App() {
       );
     } else {
       return (
-        <Button
+        <LoadingButton
           variant="contained"
           onClick={() => handleOpenDialog()}
+          loading={loadingStatus}
           disabled={wait}
         >
           Открыть
-        </Button>
+        </LoadingButton>
       );
     }
   };
@@ -244,8 +267,8 @@ function App() {
   let appBar = (
     <AppBar position="static">
       <Toolbar>
-        <Tooltip title={status} placement="top">
-          {isOnline ? <LanguageIcon /> : <ComputerIcon />}
+        <Tooltip title={isOnline} placement="top">
+          {isOnlineIcon ? <LanguageIcon /> : <ComputerIcon />}
         </Tooltip>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, ml: 1.5 }}>
           {header}
@@ -289,8 +312,8 @@ function App() {
         setTreeView,
         lastSelect,
         setLastSelect,
-        selectedNodes,
-        setSelectedNodes,
+        selectedNode,
+        setSelectedNode,
         sortAZ,
         setSortAZ,
         setVisibleAuth,
@@ -299,8 +322,8 @@ function App() {
         setSettingsErr,
         setDataErr,
         setHeader,
-        setStatus,
         setIsOnline,
+        setIsOnlineIcon,
       }}
     >
       <React.Fragment>

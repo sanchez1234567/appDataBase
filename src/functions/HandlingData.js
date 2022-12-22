@@ -6,13 +6,7 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import InstallDesktopIcon from "@mui/icons-material/InstallDesktop";
 import SortAZ from "./SortAZ.js";
 
-export default function HandlingData(
-  response,
-  openUrl,
-  openSetup,
-  sortAZValue,
-  list
-) {
+export default function HandlingData(response, sortAZValue, list) {
   const lineText = response.split(/\r?\n/);
 
   let dataObj = {
@@ -62,14 +56,14 @@ export default function HandlingData(
         if (lineText[subindex].includes("https")) {
           flatArr[newID - 1].iconButton = (
             <IconButton
-              onClick={() =>
-                openUrl(
-                  lineText[subindex].slice(
-                    lineText[subindex].indexOf('"') + 1,
-                    lineText[subindex].length - 2
-                  )
-                )
-              }
+            // onClick={() =>
+            //   openUrl(
+            //     lineText[subindex].slice(
+            //       lineText[subindex].indexOf('"') + 1,
+            //       lineText[subindex].length - 2
+            //     )
+            //   )
+            // }
             >
               <OpenInNewIcon />
             </IconButton>
@@ -80,7 +74,7 @@ export default function HandlingData(
           !lineText[subindex].includes("https")
         ) {
           flatArr[newID - 1].iconButton = (
-            <IconButton onClick={openSetup}>
+            <IconButton>
               <InstallDesktopIcon />
             </IconButton>
           );
