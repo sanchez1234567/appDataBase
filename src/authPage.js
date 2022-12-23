@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Typography, Box, Grid, Stack, TextField, Button } from "@mui/material";
+import { Typography, Box, Grid, Stack, TextField } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 import Item from "./Item.js";
 import { useData } from "./App.js";
 
@@ -25,8 +26,10 @@ export default function AuthPage() {
   const { setIsOnlineIcon } = useData();
 
   const [title, setTitle] = useState("Выполните вход");
+  const [loadStatus, setLoadStatus] = useState(false);
 
   const getUserSettings = async () => {
+    setLoadStatus(true);
     try {
       const responseUserSettings = await fetch(
         `http://localhost:5000/${currentUser.name}Settings`,
@@ -90,6 +93,7 @@ export default function AuthPage() {
     }
     if (String(errUserSet).includes("401")) {
       setTitle("Неверное имя пользователя или пароль");
+      setLoadStatus(false);
     }
     if (String(errUserSet).includes("404")) {
       setVisibleAuth(false);
@@ -144,10 +148,12 @@ export default function AuthPage() {
         setIsOnlineIcon(false);
         switchToTreeFolder();
         setHeader("Список баз");
+        setLoadStatus(false);
       }
     }
     if (String(errUserData).includes("401")) {
       setTitle("Неверное имя пользователя или пароль");
+      setLoadStatus(false);
     }
     if (String(errUserData).includes("404")) {
       setVisibleAuth(false);
@@ -196,9 +202,10 @@ export default function AuthPage() {
         </Grid>
         <Grid item xs={3}>
           <Item sx={{ boxShadow: 0 }}>
-            <Button
+            <LoadingButton
               variant="contained"
               size="medium"
+              loading={loadStatus}
               fullWidth={true}
               onClick={getUserSettings}
               sx={{ borderRadius: 0 }}
@@ -210,7 +217,7 @@ export default function AuthPage() {
               }
             >
               Войти
-            </Button>
+            </LoadingButton>
           </Item>
         </Grid>
       </Grid>
