@@ -10,11 +10,11 @@
   "UserSettings": {
     "Settings": {
       "Header": "Настройки",
-      "OpenInNew": true,
+      "OpenInNew": false,
       "TreeView": true,
       "LastSelect": [
         true,
-        "c9e56bf2-6f83-4859-809e-8c1d206b174d"
+        "8ff63387-6421-410e-b2f8-aae592b4cac0"
       ],
       "SortAZ": false
     },

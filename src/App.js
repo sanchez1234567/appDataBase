@@ -11,6 +11,7 @@ import LanguageIcon from "@mui/icons-material/Language";
 import ComputerIcon from "@mui/icons-material/Computer";
 import CancelIcon from "@mui/icons-material/Cancel";
 import UndoIcon from "@mui/icons-material/Undo";
+import ViewListRoundedIcon from "@mui/icons-material/ViewListRounded";
 import TreeFolderPage from "./TreeFolderPage.js";
 import AuthPage from "./AuthPage.js";
 import LocalSetupPage from "./LocalSetupPage.js";
@@ -33,6 +34,7 @@ function App() {
   const [auth, setAuth] = useState(false);
   const [isOnline, setIsOnline] = useState("");
   const [isOnlineIcon, setIsOnlineIcon] = useState([]);
+  const [backDrop, setBackDrop] = useState(false);
 
   const [data, setData] = useState([]);
   const [userName, setUserName] = useState("");
@@ -213,7 +215,10 @@ function App() {
         if (visibleTreeFolder === false) {
           switchToTreeFolder();
         } else {
-          SendNewSettings(currentUserSet).then(closeApp);
+          setBackDrop(true);
+          SendNewSettings(currentUserSet)
+            .then(() => setBackDrop(false))
+            .then(() => closeApp());
         }
       if (!openInNew) {
         if (visibleTreeFolder === false) {
@@ -257,8 +262,9 @@ function App() {
           onClick={() => handleOpenDialog()}
           loading={loadingStatus}
           disabled={wait}
+          sx={{ borderRadius: 4 }}
         >
-          Открыть
+          <ViewListRoundedIcon />
         </LoadingButton>
       );
     }
@@ -324,6 +330,8 @@ function App() {
         setHeader,
         setIsOnline,
         setIsOnlineIcon,
+        backDrop,
+        setBackDrop,
       }}
     >
       <React.Fragment>

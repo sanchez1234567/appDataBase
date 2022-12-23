@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { TreeView, TreeItem } from "@mui/lab";
-import { Typography, Box, Grid, Link } from "@mui/material";
+import {
+  Typography,
+  Box,
+  Grid,
+  Link,
+  Backdrop,
+  CircularProgress,
+} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Item from "./Item.js";
@@ -19,6 +26,8 @@ export default function TreeFolderPage() {
   const { setSelectedNode } = useData();
   const { switchToSetupPage } = useData();
   const { currentUserSet } = useData();
+  const { backDrop } = useData();
+  const { setBackDrop } = useData();
 
   const [folder, setFolder] = useState("Folder");
   const getNameFolder = (fold) => {
@@ -42,9 +51,10 @@ export default function TreeFolderPage() {
     if (lastSelect) {
       if (event.target.localName === "svg") {
         if (!openInNew && event.target.dataset.testid === "OpenInNewIcon") {
-          SendNewSettings(currentUserSet).then(() =>
-            window.open(`${urlConnect}`, "_self")
-          );
+          setBackDrop(true);
+          SendNewSettings(currentUserSet)
+            .then(() => setBackDrop(false))
+            .then(() => window.open(`${urlConnect}`, "_self"));
         }
         if (openInNew && event.target.dataset.testid === "OpenInNewIcon") {
           window.open(`${urlConnect}`, "_blank");
@@ -53,9 +63,10 @@ export default function TreeFolderPage() {
           !openInNew &&
           event.target.dataset.testid === "InstallDesktopIcon"
         ) {
-          SendNewSettings(currentUserSet).then(() => {
-            switchToSetupPage();
-          });
+          setBackDrop(true);
+          SendNewSettings(currentUserSet)
+            .then(() => setBackDrop(false))
+            .then(() => switchToSetupPage());
         }
         if (openInNew && event.target.dataset.testid === "InstallDesktopIcon") {
           switchToSetupPage();
@@ -127,6 +138,15 @@ export default function TreeFolderPage() {
 
   return (
     <Box sx={{ flexGrow: 1, mt: 1, ml: 1.2 }}>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={backDrop}
+      >
+        <CircularProgress color="primary" size="1.5rem" />
+        <Typography variant="h6" sx={{ ml: 1 }}>
+          сохрание настроек...
+        </Typography>
+      </Backdrop>
       <Grid item xs={12}>
         <Item
           sx={{
