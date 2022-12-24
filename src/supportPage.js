@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Box, Grid, Typography, Button, TextField } from "@mui/material";
-import { Snackbar, IconButton } from "@mui/material";
+import { Backdrop, CircularProgress } from "@mui/material";
 import Item from "./Item.js";
 import CallIcon from "@mui/icons-material/Call";
 import EmailIcon from "@mui/icons-material/Email";
 import LanguageIcon from "@mui/icons-material/Language";
-import CloseIcon from "@mui/icons-material/Close";
+import DoneIcon from "@mui/icons-material/Done";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useData } from "./App.js";
 
 export default function SupportPage() {
@@ -20,34 +21,19 @@ export default function SupportPage() {
     message: userMessage,
   };
 
-  const [openSnack, setOpenSnack] = useState(false);
-  const [messageOk, setMessageOk] = useState("");
-  const handleClose = () => {
-    setOpenSnack(false);
-  };
+  const [backDropOpen, setBackDropOpen] = useState(false);
+  const [backDropText, setBackDropText] = useState("");
+  const [backDropIcon, setBackDropIcon] = useState([]);
+  const [enableHandleClose, setEnableHandleClose] = useState(false);
 
-  const openSnackbar = () => {
-    return (
-      <Snackbar
-        open={openSnack}
-        autoHideDuration={6000}
-        onClose={handleClose}
-        message={messageOk}
-        action={
-          <IconButton
-            size="small"
-            aria-label="close"
-            color="inherit"
-            onClick={handleClose}
-          >
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        }
-      ></Snackbar>
-    );
+  const handleCloseBackDrop = () => {
+    setBackDropOpen(false);
   };
 
   const sendUserMessage = async () => {
+    setBackDropIcon(<CircularProgress color="primary" size="1.5rem" />);
+    setBackDropOpen(true);
+    setBackDropText("отправка сообщения");
     try {
       const sendFetch = await fetch(
         `http://localhost:5000/${user.name}Message`,
@@ -60,8 +46,9 @@ export default function SupportPage() {
         }
       );
       if (sendFetch.ok) {
-        setMessageOk("Сообщение отправлено");
-        setOpenSnack(true);
+        setBackDropIcon(<DoneIcon color="success" fontSize="large" />);
+        setBackDropText("сообщение отправлено");
+        setEnableHandleClose(true);
       }
       if (
         !sendFetch.ok &&
@@ -70,8 +57,11 @@ export default function SupportPage() {
         throw new Error("Failed to fetch");
       }
     } catch (err) {
-      setMessageOk("Сообщение не отправлено");
-      setOpenSnack(true);
+      setBackDropIcon(
+        <ErrorOutlineIcon sx={{ color: "#f44336" }} fontSize="large" />
+      );
+      setBackDropText("сообщение не отправлено");
+      setEnableHandleClose(true);
     }
   };
 
@@ -81,6 +71,16 @@ export default function SupportPage() {
 
   return (
     <Box mt={2} ml={2} mr={2}>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={backDropOpen}
+        onClick={enableHandleClose ? handleCloseBackDrop : null}
+      >
+        {backDropIcon}
+        <Typography variant="h6" sx={{ ml: 1 }}>
+          {backDropText}
+        </Typography>
+      </Backdrop>
       <Grid container spacing={0} mt={1}>
         <Grid item xs={1}>
           <Item sx={{ boxShadow: 0 }}>
@@ -134,7 +134,7 @@ export default function SupportPage() {
           </Item>
         </Grid>
         <Grid item xs={9}>
-          <Item sx={{ boxShadow: 0 }}>{openSnackbar()}</Item>
+          <Item sx={{ boxShadow: 0 }}></Item>
         </Grid>
         <Grid item xs={3}>
           <Item sx={{ boxShadow: 0 }}>

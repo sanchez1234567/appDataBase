@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Typography, Button } from "@mui/material";
-import { Switch, Grid } from "@mui/material";
+import { Switch, Grid, Backdrop, CircularProgress } from "@mui/material";
 import Item from "./Item.js";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
@@ -19,6 +19,7 @@ export default function SettingsPage() {
   const [localOpenInNew, setLocalOpenInNew] = useState(openInNew);
   const switchOpenInNew = (event) => {
     setLocalOpenInNew(event.target.checked);
+    setCancelButton("Отмена");
   };
 
   const { setTreeView } = useData();
@@ -26,6 +27,7 @@ export default function SettingsPage() {
   const [localTreeView, setLocalTreeView] = useState(treeView);
   const switchTreeView = (event) => {
     setLocalTreeView(event.target.checked);
+    setCancelButton("Отмена");
   };
 
   const { setLastSelect } = useData();
@@ -33,6 +35,7 @@ export default function SettingsPage() {
   const [localLastSelect, setLocalLastSelect] = useState(lastSelect);
   const switchLastSelect = (event) => {
     setLocalLastSelect(event.target.checked);
+    setCancelButton("Отмена");
   };
 
   const { setSortAZ } = useData();
@@ -40,10 +43,12 @@ export default function SettingsPage() {
   const [localSortAZ, setLocalSortAZ] = useState(sortAZ);
   const switchSortAZ = (event) => {
     setLocalSortAZ(event.target.checked);
+    setCancelButton("Отмена");
   };
 
   const [cancelButton, setCancelButton] = useState("Отмена");
   const saveSwitchValues = () => {
+    setBackDrop(true);
     setOpenInNew(localOpenInNew);
     appSettings.UserSettings.Settings.OpenInNew = localOpenInNew;
     setTreeView(localTreeView);
@@ -53,12 +58,15 @@ export default function SettingsPage() {
     appSettings.UserSettings.Settings.LastSelect["1"] = selectedNode;
     setSortAZ(localSortAZ);
     appSettings.UserSettings.Settings.SortAZ = localSortAZ;
-    setCancelButton("Назад");
-    SendNewSettings(currentUserSet);
+    SendNewSettings(currentUserSet)
+      .then(() => setBackDrop(false))
+      .then(() => setCancelButton("Назад"));
   };
 
   const { undoPage } = useData();
   const { auth } = useData();
+  const { backDrop } = useData();
+  const { setBackDrop } = useData();
 
   const renderLine = (icon, text, marTop, switchValue, handleSwitch) => {
     return (
@@ -95,6 +103,15 @@ export default function SettingsPage() {
 
   return (
     <Box sx={{ flexGrow: 1, mt: 1, ml: 1.2 }}>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={backDrop}
+      >
+        <CircularProgress color="primary" size="1.5rem" />
+        <Typography variant="h6" sx={{ ml: 1 }}>
+          сохрание настроек...
+        </Typography>
+      </Backdrop>
       <Box sx={{ boxShadow: 0, border: 1, height: 330, maxWidth: 510 }}>
         {renderLine(
           <OpenInNewIcon />,
