@@ -49,11 +49,13 @@ function App() {
   const [visibleSupport, setVisibleSupport] = useState(false);
   const [visibleAppBar, setVisibleAppBar] = useState(false);
 
-  const [openInNew, setOpenInNew] = useState(false);
-  const [treeView, setTreeView] = useState(true);
-  const [lastSelect, setLastSelect] = useState(false);
-  const [selectedNode, setSelectedNode] = useState("");
-  const [sortAZ, setSortAZ] = useState(false);
+  const [settingsObj, setSettingsObj] = useState({
+    openInNew: false,
+    treeView: false,
+    lastSelect: false,
+    selectedNode: "",
+    sortAZ: false,
+  });
 
   let currentUser = {
     name: userName,
@@ -203,15 +205,15 @@ function App() {
   };
 
   const undoPage = () => {
-    if (!lastSelect) {
+    if (!settingsObj.lastSelect) {
       if (visibleTreeFolder === false) {
         switchToTreeFolder();
       } else {
         closeApp();
       }
     }
-    if (lastSelect) {
-      if (openInNew)
+    if (settingsObj.lastSelect) {
+      if (settingsObj.openInNew)
         if (visibleTreeFolder === false) {
           switchToTreeFolder();
         } else {
@@ -220,7 +222,7 @@ function App() {
             .then(() => setBackDrop(false))
             .then(() => closeApp());
         }
-      if (!openInNew) {
+      if (!settingsObj.openInNew) {
         if (visibleTreeFolder === false) {
           switchToTreeFolder();
         } else {
@@ -298,30 +300,22 @@ function App() {
   return (
     <DataContext.Provider
       value={{
+        auth,
+        settingsObj,
+        setSettingsObj,
         data,
+        setData,
         currentUser,
         currentUserSet,
         userName,
         userPassword,
         setUserName,
         setUserPassword,
-        auth,
         appSettings,
-        setData,
+        setAppSettings,
         undoPage,
-        openInNew,
-        setOpenInNew,
         switchToSetupPage,
         switchToTreeFolder,
-        treeView,
-        setAppSettings,
-        setTreeView,
-        lastSelect,
-        setLastSelect,
-        selectedNode,
-        setSelectedNode,
-        sortAZ,
-        setSortAZ,
         setVisibleAuth,
         setOpenDialog,
         setServerErr,

@@ -5,6 +5,7 @@ import Item from "./Item.js";
 import { useData } from "./App.js";
 
 export default function AuthPage() {
+  const { setSettingsObj } = useData();
   const { setData } = useData();
   const { setUserName } = useData();
   const { setUserPassword } = useData();
@@ -16,11 +17,6 @@ export default function AuthPage() {
   const { setSettingsErr } = useData();
   const { setDataErr } = useData();
   const { setHeader } = useData();
-  const { setOpenInNew } = useData();
-  const { setTreeView } = useData();
-  const { setLastSelect } = useData();
-  const { setSelectedNode } = useData();
-  const { setSortAZ } = useData();
   const { currentUser } = useData();
   const { setIsOnline } = useData();
   const { setIsOnlineIcon } = useData();
@@ -48,11 +44,37 @@ export default function AuthPage() {
           JSON.stringify(resultUserSettings)
         );
         setAppSettings(resultUserSettings);
-        setOpenInNew(resultUserSettings.UserSettings.Settings.OpenInNew);
-        setTreeView(resultUserSettings.UserSettings.Settings.TreeView);
-        setLastSelect(resultUserSettings.UserSettings.Settings.LastSelect[0]);
-        setSelectedNode(resultUserSettings.UserSettings.Settings.LastSelect[1]);
-        setSortAZ(resultUserSettings.UserSettings.Settings.SortAZ);
+        setSettingsObj((prevSet) => {
+          return {
+            ...prevSet,
+            openInNew: resultUserSettings.UserSettings.Settings.OpenInNew,
+          };
+        });
+        setSettingsObj((prevSet) => {
+          return {
+            ...prevSet,
+            treeView: resultUserSettings.UserSettings.Settings.TreeView,
+          };
+        });
+        setSettingsObj((prevSet) => {
+          return {
+            ...prevSet,
+            lastSelect: resultUserSettings.UserSettings.Settings.LastSelect[0],
+          };
+        });
+        setSettingsObj((prevSet) => {
+          return {
+            ...prevSet,
+            selectedNode:
+              resultUserSettings.UserSettings.Settings.LastSelect[1],
+          };
+        });
+        setSettingsObj((prevSet) => {
+          return {
+            ...prevSet,
+            sortAZ: resultUserSettings.UserSettings.Settings.SortAZ,
+          };
+        });
         getUserData(resultUserSettings);
       }
       if (!responseUserSettings.ok && responseUserSettings.status === 404) {
@@ -138,11 +160,36 @@ export default function AuthPage() {
         setServerErr(true);
       }
       if (localStorage.getItem(`${currentUser.name}Data`) !== null) {
-        setOpenInNew(localUserSet.UserSettings.Settings.OpenInNew);
-        setTreeView(localUserSet.UserSettings.Settings.TreeView);
-        setLastSelect(localUserSet.UserSettings.Settings.LastSelect[0]);
-        setSelectedNode(localUserSet.UserSettings.Settings.LastSelect[1]);
-        setSortAZ(localUserSet.UserSettings.Settings.SortAZ);
+        setSettingsObj((prevSet) => {
+          return {
+            ...prevSet,
+            openInNew: localUserSet.UserSettings.Settings.OpenInNew,
+          };
+        });
+        setSettingsObj((prevSet) => {
+          return {
+            ...prevSet,
+            treeView: localUserSet.UserSettings.Settings.TreeView,
+          };
+        });
+        setSettingsObj((prevSet) => {
+          return {
+            ...prevSet,
+            lastSelect: localUserSet.UserSettings.Settings.LastSelect[0],
+          };
+        });
+        setSettingsObj((prevSet) => {
+          return {
+            ...prevSet,
+            selectedNode: localUserSet.UserSettings.Settings.LastSelect[1],
+          };
+        });
+        setSettingsObj((prevSet) => {
+          return {
+            ...prevSet,
+            sortAZ: localUserSet.UserSettings.Settings.SortAZ,
+          };
+        });
         setData(localStorage.getItem(`${currentUser.name}Data`));
         setIsOnline(`${currentUser.name} (оффлайн)`);
         setIsOnlineIcon(false);

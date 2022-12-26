@@ -30,7 +30,6 @@ export default async function SendNewSettings(user) {
           }
           if (cnt === 0) {
             existArr.push(currentUser);
-            console.log(existArr);
           }
         }
         localStorage.setItem("filesArr", JSON.stringify(existArr));

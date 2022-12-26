@@ -11,13 +11,9 @@ import SendNewSettings from "./functions/SendNewSettings.js";
 
 export default function TreeFolderPage() {
   const { appSettings } = useData();
-  const { treeView } = useData();
-  const { sortAZ } = useData();
-  const { lastSelect } = useData();
+  const { settingsObj } = useData();
+  const { setSettingsObj } = useData();
   const { data } = useData();
-  const { openInNew } = useData();
-  const { selectedNode } = useData();
-  const { setSelectedNode } = useData();
   const { switchToSetupPage } = useData();
   const { currentUserSet } = useData();
   const { backDrop } = useData();
@@ -29,12 +25,18 @@ export default function TreeFolderPage() {
   };
 
   const openSetupLink = (event, urlConnect) => {
-    if (!lastSelect) {
+    if (!settingsObj.lastSelect) {
       if (event.target.localName === "svg") {
-        if (!openInNew && event.target.dataset.testid === "OpenInNewIcon") {
+        if (
+          !settingsObj.openInNew &&
+          event.target.dataset.testid === "OpenInNewIcon"
+        ) {
           window.open(`${urlConnect}`, "_self");
         }
-        if (openInNew && event.target.dataset.testid === "OpenInNewIcon") {
+        if (
+          settingsObj.openInNew &&
+          event.target.dataset.testid === "OpenInNewIcon"
+        ) {
           window.open(`${urlConnect}`, "_blank");
         }
         if (event.target.dataset.testid === "InstallDesktopIcon") {
@@ -42,19 +44,25 @@ export default function TreeFolderPage() {
         }
       }
     }
-    if (lastSelect) {
+    if (settingsObj.lastSelect) {
       if (event.target.localName === "svg") {
-        if (!openInNew && event.target.dataset.testid === "OpenInNewIcon") {
+        if (
+          !settingsObj.openInNew &&
+          event.target.dataset.testid === "OpenInNewIcon"
+        ) {
           setBackDrop(true);
           SendNewSettings(currentUserSet)
             .then(() => setBackDrop(false))
             .then(() => window.open(`${urlConnect}`, "_self"));
         }
-        if (openInNew && event.target.dataset.testid === "OpenInNewIcon") {
+        if (
+          settingsObj.openInNew &&
+          event.target.dataset.testid === "OpenInNewIcon"
+        ) {
           window.open(`${urlConnect}`, "_blank");
         }
         if (
-          !openInNew &&
+          !settingsObj.openInNew &&
           event.target.dataset.testid === "InstallDesktopIcon"
         ) {
           setBackDrop(true);
@@ -62,7 +70,10 @@ export default function TreeFolderPage() {
             .then(() => setBackDrop(false))
             .then(() => switchToSetupPage());
         }
-        if (openInNew && event.target.dataset.testid === "InstallDesktopIcon") {
+        if (
+          settingsObj.openInNew &&
+          event.target.dataset.testid === "InstallDesktopIcon"
+        ) {
           switchToSetupPage();
         }
       }
@@ -71,15 +82,20 @@ export default function TreeFolderPage() {
 
   const handleSelect = (event, nodeIds) => {
     if (event.target.localName === "svg") {
-      setSelectedNode(String(nodeIds));
+      setSettingsObj((prevSet) => {
+        return {
+          ...prevSet,
+          selectedNode: String(nodeIds),
+        };
+      });
       appSettings.UserSettings.Settings.LastSelect["1"] = nodeIds;
     }
   };
 
   const openLink = async (url) => {
-    if (openInNew === false) {
+    if (settingsObj.openInNew === false) {
       window.open(`${url}`, "_self");
-    } else if (openInNew === true) {
+    } else if (settingsObj.openInNew === true) {
       window.open(`${url}`, "_blank");
     }
   };
@@ -152,8 +168,8 @@ export default function TreeFolderPage() {
           }}
         >
           <TreeView
-            selected={lastSelect ? selectedNode : null}
-            onNodeSelect={lastSelect ? handleSelect : null}
+            selected={settingsObj.lastSelect ? settingsObj.selectedNode : null}
+            onNodeSelect={settingsObj.lastSelect ? handleSelect : null}
             aria-label="rich object"
             defaultCollapseIcon={<ExpandMoreIcon />}
             defaultExpanded={["root"]}
@@ -165,7 +181,9 @@ export default function TreeFolderPage() {
               overflowY: "auto",
             }}
           >
-            {renderTree(HandlingData(data, sortAZ, treeView))}
+            {renderTree(
+              HandlingData(data, settingsObj.sortAZ, settingsObj.treeView)
+            )}
           </TreeView>
         </Item>
       </Grid>

@@ -11,36 +11,31 @@ import SendNewSettings from "./functions/SendNewSettings.js";
 
 export default function SettingsPage() {
   const { appSettings } = useData();
-  const { selectedNode } = useData();
   const { currentUserSet } = useData();
+  const { settingsObj } = useData();
+  const { setSettingsObj } = useData();
 
-  const { setOpenInNew } = useData();
-  const { openInNew } = useData();
-  const [localOpenInNew, setLocalOpenInNew] = useState(openInNew);
+  const [localOpenInNew, setLocalOpenInNew] = useState(settingsObj.openInNew);
   const switchOpenInNew = (event) => {
     setLocalOpenInNew(event.target.checked);
     setCancelButton("Отмена");
   };
 
-  const { setTreeView } = useData();
-  const { treeView } = useData();
-  const [localTreeView, setLocalTreeView] = useState(treeView);
+  const [localTreeView, setLocalTreeView] = useState(settingsObj.treeView);
   const switchTreeView = (event) => {
     setLocalTreeView(event.target.checked);
     setCancelButton("Отмена");
   };
 
-  const { setLastSelect } = useData();
-  const { lastSelect } = useData();
-  const [localLastSelect, setLocalLastSelect] = useState(lastSelect);
+  const [localLastSelect, setLocalLastSelect] = useState(
+    settingsObj.lastSelect
+  );
   const switchLastSelect = (event) => {
     setLocalLastSelect(event.target.checked);
     setCancelButton("Отмена");
   };
 
-  const { setSortAZ } = useData();
-  const { sortAZ } = useData();
-  const [localSortAZ, setLocalSortAZ] = useState(sortAZ);
+  const [localSortAZ, setLocalSortAZ] = useState(settingsObj.sortAZ);
   const switchSortAZ = (event) => {
     setLocalSortAZ(event.target.checked);
     setCancelButton("Отмена");
@@ -49,14 +44,33 @@ export default function SettingsPage() {
   const [cancelButton, setCancelButton] = useState("Отмена");
   const saveSwitchValues = () => {
     setBackDrop(true);
-    setOpenInNew(localOpenInNew);
+    setSettingsObj((prevSet) => {
+      return {
+        ...prevSet,
+        openInNew: localOpenInNew,
+      };
+    });
+    setSettingsObj((prevSet) => {
+      return {
+        ...prevSet,
+        treeView: localTreeView,
+      };
+    });
+    setSettingsObj((prevSet) => {
+      return {
+        ...prevSet,
+        lastSelect: localLastSelect,
+      };
+    });
+    setSettingsObj((prevSet) => {
+      return {
+        ...prevSet,
+        sortAZ: localSortAZ,
+      };
+    });
     appSettings.UserSettings.Settings.OpenInNew = localOpenInNew;
-    setTreeView(localTreeView);
     appSettings.UserSettings.Settings.TreeView = localTreeView;
-    setLastSelect(localLastSelect);
     appSettings.UserSettings.Settings.LastSelect["0"] = localLastSelect;
-    appSettings.UserSettings.Settings.LastSelect["1"] = selectedNode;
-    setSortAZ(localSortAZ);
     appSettings.UserSettings.Settings.SortAZ = localSortAZ;
     SendNewSettings(currentUserSet)
       .then(() => setBackDrop(false))
