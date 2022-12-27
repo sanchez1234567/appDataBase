@@ -23,7 +23,6 @@ export default function TreeFolderPage() {
 
   const [folder, setFolder] = useState("");
   const [foldSelectedNode, setFoldSelectedNode] = useState("");
-  //const [expanded, setExpanded] = useState(["root"]);
   const getNameFolder = (fold, id, child) => {
     setFolder(`${fold}`);
     if (settingsObj.lastSelect) {

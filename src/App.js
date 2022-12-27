@@ -335,12 +335,12 @@ function App() {
         <CssBaseline />
         <Box
           sx={{
-            height: 500,
-            width: 550,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            mx: "auto",
+            height: 50,
+            width: 55,
+            // display: "flex",
+            // justifyContent: "center",
+            // alignItems: "center",
+            // mx: "auto",
           }}
         >
           {renderButton()}
