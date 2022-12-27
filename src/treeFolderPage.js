@@ -18,13 +18,27 @@ export default function TreeFolderPage() {
   const { currentUserSet } = useData();
   const { backDrop } = useData();
   const { setBackDrop } = useData();
+  const { expanded } = useData();
+  const { setExpanded } = useData();
 
   const [folder, setFolder] = useState("");
   const [foldSelectedNode, setFoldSelectedNode] = useState("");
-  const getNameFolder = (fold, id) => {
+  //const [expanded, setExpanded] = useState(["root"]);
+  const getNameFolder = (fold, id, child) => {
     setFolder(`${fold}`);
     if (settingsObj.lastSelect) {
       setFoldSelectedNode(String(id));
+    }
+    if (child.length > 0) {
+      idAddRemove(id);
+    }
+  };
+
+  const idAddRemove = (itemId) => {
+    if (!expanded.includes(String(itemId))) {
+      setExpanded((oldArr) => [...oldArr, String(itemId)]);
+    } else {
+      setExpanded((oldArr) => oldArr.filter((str) => str !== String(itemId)));
     }
   };
 
@@ -173,7 +187,7 @@ export default function TreeFolderPage() {
           </Box>
         }
         onClick={(event) => {
-          getNameFolder(nodes.connect, nodes.id);
+          getNameFolder(nodes.connect, nodes.id, nodes.children);
           openSetupLink(event, nodes.connect);
         }}
         sx={{
@@ -214,7 +228,7 @@ export default function TreeFolderPage() {
             onNodeSelect={settingsObj.lastSelect ? handleSelect : null}
             aria-label="rich object"
             defaultCollapseIcon={<ExpandMoreIcon />}
-            defaultExpanded={["root"]}
+            expanded={expanded}
             defaultExpandIcon={<ChevronRightIcon />}
             sx={{
               height: 350,

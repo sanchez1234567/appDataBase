@@ -35,6 +35,7 @@ function App() {
   const [isOnline, setIsOnline] = useState("");
   const [isOnlineIcon, setIsOnlineIcon] = useState([]);
   const [backDrop, setBackDrop] = useState(false);
+  const [expanded, setExpanded] = useState(["root"]);
 
   const [data, setData] = useState([]);
   const [userName, setUserName] = useState("");
@@ -326,6 +327,8 @@ function App() {
         setIsOnlineIcon,
         backDrop,
         setBackDrop,
+        expanded,
+        setExpanded,
       }}
     >
       <React.Fragment>

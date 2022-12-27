@@ -28,7 +28,7 @@ export default function HandlingData(response, sortAZValue, list) {
         name: lineText[index].slice(1, lineText[index].length - 1),
         folder: "",
         children: [],
-        connect: "Folder",
+        connect: "",
         iconButton: null,
         icon: <ComputerIcon />,
       });
