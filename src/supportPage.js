@@ -46,6 +46,7 @@ export default function SupportPage() {
         }
       );
       if (sendFetch.ok) {
+        setUserMessage("");
         setBackDropIcon(<DoneIcon color="success" fontSize="large" />);
         setBackDropText("сообщение отправлено");
         setEnableHandleClose(true);
@@ -57,6 +58,7 @@ export default function SupportPage() {
         throw new Error("Failed to fetch");
       }
     } catch (err) {
+      setUserMessage("");
       setBackDropIcon(
         <ErrorOutlineIcon sx={{ color: "#f44336" }} fontSize="large" />
       );
@@ -126,7 +128,7 @@ export default function SupportPage() {
                 rows={9}
                 id="outlined-required"
                 label="Сообщение в поддержку"
-                defaultValue=" "
+                value={userMessage}
                 sx={{ width: 480 }}
                 onChange={getUserMessage}
               ></TextField>

@@ -11,12 +11,12 @@
     "Settings": {
       "Header": "Настройки",
       "OpenInNew": false,
-      "TreeView": true,
+      "TreeView": false,
       "LastSelect": [
-        false,
-        "7f2f3158-fc81-4bfe-b811-6ea3293a3fca"
+        true,
+        "8ff63387-6421-410e-b2f8-aae592b4cac0"
       ],
-      "SortAZ": false
+      "SortAZ": true
     },
     "Help": {
       "Header": "Помощь/Поддержка",

@@ -20,12 +20,10 @@ export default function HandlingData(response, sortAZValue, list) {
   };
 
   let flatArr = [];
-  //let id = 1;
   let newID = -1;
   for (let index = 0; index < lineText.length; index += 1) {
     if (lineText[index].includes("[")) {
       newID = flatArr.push({
-        //id: id,
         id: "",
         name: lineText[index].slice(1, lineText[index].length - 1),
         folder: "",
@@ -55,16 +53,7 @@ export default function HandlingData(response, sortAZValue, list) {
         }
         if (lineText[subindex].includes("https")) {
           flatArr[newID - 1].iconButton = (
-            <IconButton
-            // onClick={() =>
-            //   openUrl(
-            //     lineText[subindex].slice(
-            //       lineText[subindex].indexOf('"') + 1,
-            //       lineText[subindex].length - 2
-            //     )
-            //   )
-            // }
-            >
+            <IconButton>
               <OpenInNewIcon />
             </IconButton>
           );
@@ -80,7 +69,6 @@ export default function HandlingData(response, sortAZValue, list) {
           );
         }
       }
-      //id += 1;
     }
   }
 

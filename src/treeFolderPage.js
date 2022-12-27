@@ -19,9 +19,13 @@ export default function TreeFolderPage() {
   const { backDrop } = useData();
   const { setBackDrop } = useData();
 
-  const [folder, setFolder] = useState("Folder");
-  const getNameFolder = (fold) => {
+  const [folder, setFolder] = useState("");
+  const [foldSelectedNode, setFoldSelectedNode] = useState("");
+  const getNameFolder = (fold, id) => {
     setFolder(`${fold}`);
+    if (settingsObj.lastSelect) {
+      setFoldSelectedNode(String(id));
+    }
   };
 
   const openSetupLink = (event, urlConnect) => {
@@ -93,10 +97,37 @@ export default function TreeFolderPage() {
   };
 
   const openLink = async (url) => {
-    if (settingsObj.openInNew === false) {
-      window.open(`${url}`, "_self");
-    } else if (settingsObj.openInNew === true) {
-      window.open(`${url}`, "_blank");
+    if (!settingsObj.lastSelect) {
+      if (settingsObj.openInNew === false) {
+        window.open(`${url}`, "_self");
+      } else if (settingsObj.openInNew === true) {
+        window.open(`${url}`, "_blank");
+      }
+    }
+    if (settingsObj.lastSelect) {
+      if (settingsObj.openInNew === false) {
+        setSettingsObj((prevSet) => {
+          return {
+            ...prevSet,
+            selectedNode: foldSelectedNode,
+          };
+        });
+        appSettings.UserSettings.Settings.LastSelect["1"] = foldSelectedNode;
+        setBackDrop(true);
+        SendNewSettings(currentUserSet)
+          .then(() => setBackDrop(false))
+          .then(() => window.open(`${url}`, "_self"));
+      }
+      if (settingsObj.openInNew === true) {
+        setSettingsObj((prevSet) => {
+          return {
+            ...prevSet,
+            selectedNode: foldSelectedNode,
+          };
+        });
+        appSettings.UserSettings.Settings.LastSelect["1"] = foldSelectedNode;
+        window.open(`${url}`, "_blank");
+      }
     }
   };
 
@@ -118,7 +149,15 @@ export default function TreeFolderPage() {
         key={nodes.id}
         nodeId={String(nodes.id)}
         label={
-          <Box sx={{ display: "flex", alignItems: "center", p: 0.5, pr: 0 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              p: 0.5,
+              pr: 0,
+              cursor: "default",
+            }}
+          >
             <Box color="inherit" sx={{ mr: 1 }}>
               {nodes.icon}
             </Box>
@@ -134,10 +173,13 @@ export default function TreeFolderPage() {
           </Box>
         }
         onClick={(event) => {
-          getNameFolder(nodes.connect);
+          getNameFolder(nodes.connect, nodes.id);
           openSetupLink(event, nodes.connect);
         }}
-        sx={{ mt: 0.5, "&& .Mui-selected": { backgroundColor: "#6ab7ff" } }}
+        sx={{
+          mt: 0.5,
+          "&& .Mui-selected": { backgroundColor: "#6ab7ff" },
+        }}
       >
         {Array.isArray(nodes.children)
           ? nodes.children.map((node) => renderTree(node))
