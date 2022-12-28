@@ -126,7 +126,15 @@ export default function SettingsPage() {
           сохрание настроек...
         </Typography>
       </Backdrop>
-      <Box sx={{ boxShadow: 0, border: 1, height: 330, maxWidth: 510 }}>
+      <Box
+        sx={{
+          boxShadow: 0,
+          border: 1,
+          borderRadius: 1,
+          height: 330,
+          maxWidth: 510,
+        }}
+      >
         {renderLine(
           <OpenInNewIcon />,
           "Открыть в новой вкладке",
@@ -167,7 +175,7 @@ export default function SettingsPage() {
                 variant="contained"
                 size="medium"
                 fullWidth={true}
-                sx={{ borderRadius: 0 }}
+                sx={{ borderRadius: 1 }}
                 onClick={saveSwitchValues}
                 disabled={auth ? false : true}
               >
@@ -182,7 +190,7 @@ export default function SettingsPage() {
                 size="medium"
                 fullWidth={true}
                 onClick={undoPage}
-                sx={{ borderRadius: 0 }}
+                sx={{ borderRadius: 1 }}
               >
                 {cancelButton}
               </Button>

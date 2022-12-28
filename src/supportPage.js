@@ -144,7 +144,7 @@ export default function SupportPage() {
               variant="contained"
               size="medium"
               fullWidth={true}
-              sx={{ borderRadius: 0 }}
+              sx={{ borderRadius: 1 }}
               disabled={auth ? false : true}
               onClick={sendUserMessage}
             >

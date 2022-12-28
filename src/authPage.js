@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Typography, Box, Grid, Stack, TextField } from "@mui/material";
+import { IconButton } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Item from "./Item.js";
+import CloseIcon from "@mui/icons-material/Close";
 import { useData } from "./App.js";
 
 export default function AuthPage() {
@@ -13,13 +15,12 @@ export default function AuthPage() {
   const { switchToTreeFolder } = useData();
   const { setVisibleAuth } = useData();
   const { setOpenDialog } = useData();
-  const { setServerErr } = useData();
-  const { setSettingsErr } = useData();
-  const { setDataErr } = useData();
   const { setHeader } = useData();
   const { currentUser } = useData();
   const { setIsOnline } = useData();
   const { setIsOnlineIcon } = useData();
+  const { setOpenSnackB } = useData();
+  const { setSnackBMes } = useData();
 
   const [title, setTitle] = useState("Выполните вход");
   const [loadStatus, setLoadStatus] = useState(false);
@@ -97,7 +98,8 @@ export default function AuthPage() {
       ) {
         setVisibleAuth(false);
         setOpenDialog(false);
-        setServerErr(true);
+        setSnackBMes("Сервер не отвечает. Свяжитесь с поддержкой.");
+        setOpenSnackB(true);
       }
       if (
         localStorage.getItem(
@@ -120,7 +122,8 @@ export default function AuthPage() {
     if (String(errUserSet).includes("404")) {
       setVisibleAuth(false);
       setOpenDialog(false);
-      setSettingsErr(true);
+      setSnackBMes("Файл настроек не найден. Свяжитесь с поддержкой.");
+      setOpenSnackB(true);
     }
   };
 
@@ -157,7 +160,8 @@ export default function AuthPage() {
       if (localStorage.getItem(`${currentUser.name}Data`) === null) {
         setVisibleAuth(false);
         setOpenDialog(false);
-        setServerErr(true);
+        setSnackBMes("Сервер не отвечает. Свяжитесь с поддержкой.");
+        setOpenSnackB(true);
       }
       if (localStorage.getItem(`${currentUser.name}Data`) !== null) {
         setSettingsObj((prevSet) => {
@@ -205,7 +209,8 @@ export default function AuthPage() {
     if (String(errUserData).includes("404")) {
       setVisibleAuth(false);
       setOpenDialog(false);
-      setDataErr(true);
+      setSnackBMes("Список баз не найден. Свяжитесь с поддержкой.");
+      setOpenSnackB(true);
     }
   };
 
@@ -218,7 +223,15 @@ export default function AuthPage() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, mt: 3 }}>
+    <Box sx={{ flexGrow: 1, mt: 0 }}>
+      <IconButton
+        sx={{ ml: 61 }}
+        onClick={() => {
+          setOpenDialog(false);
+        }}
+      >
+        <CloseIcon />
+      </IconButton>
       <Grid item align={"center"}>
         <Item sx={{ boxShadow: 0 }}>
           <Typography variant="h6">{title}</Typography>
@@ -255,7 +268,7 @@ export default function AuthPage() {
               loading={loadStatus}
               fullWidth={true}
               onClick={getUserSettings}
-              sx={{ borderRadius: 0 }}
+              sx={{ borderRadius: 1 }}
               disabled={
                 currentUser["name"].length > 0 &&
                 currentUser["password"].length > 0

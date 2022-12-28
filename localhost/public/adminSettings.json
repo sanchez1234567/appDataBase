@@ -11,7 +11,7 @@
     "Settings": {
       "Header": "Настройки",
       "OpenInNew": false,
-      "TreeView": true,
+      "TreeView": false,
       "LastSelect": [
         false,
         "35ae11b5-1ded-46dd-ba02-bbabde012809"

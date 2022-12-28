@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { CssBaseline, Box, Dialog, Alert } from "@mui/material";
+import { CssBaseline, Box, Dialog, Snackbar } from "@mui/material";
 import { Typography, AppBar, Toolbar, IconButton } from "@mui/material";
 import { Tooltip } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -11,7 +11,7 @@ import LanguageIcon from "@mui/icons-material/Language";
 import ComputerIcon from "@mui/icons-material/Computer";
 import CancelIcon from "@mui/icons-material/Cancel";
 import UndoIcon from "@mui/icons-material/Undo";
-import ViewListRoundedIcon from "@mui/icons-material/ViewListRounded";
+import CloseIcon from "@mui/icons-material/Close";
 import TreeFolderPage from "./TreeFolderPage.js";
 import AuthPage from "./AuthPage.js";
 import LocalSetupPage from "./LocalSetupPage.js";
@@ -36,6 +36,8 @@ function App() {
   const [isOnlineIcon, setIsOnlineIcon] = useState([]);
   const [backDrop, setBackDrop] = useState(false);
   const [expanded, setExpanded] = useState(["root"]);
+  const [openSnackB, setOpenSnackB] = useState(false);
+  const [snackBMes, setSnackBMes] = useState("");
 
   const [data, setData] = useState([]);
   const [userName, setUserName] = useState("");
@@ -87,7 +89,8 @@ function App() {
   const handleErrSettings = (fetchErr) => {
     if (String(fetchErr).includes("Failed to fetch")) {
       if (localStorage.getItem("defaultAppSettings") === null) {
-        setServerErr(true);
+        setSnackBMes("Сервер не отвечает. Свяжитесь с поддержкой.");
+        setOpenSnackB(true);
       }
       if (localStorage.getItem("defaultAppSettings") !== null) {
         const localSettings = JSON.parse(
@@ -100,7 +103,8 @@ function App() {
       }
     }
     if (String(fetchErr).includes("404")) {
-      setSettingsErr(true);
+      setSnackBMes("Файл настроек не найден. Свяжитесь с поддержкой.");
+      setOpenSnackB(true);
     }
   };
 
@@ -131,7 +135,8 @@ function App() {
   const handleErrData = async (fetchDataErr) => {
     if (String(fetchDataErr).includes("Failed to fetch")) {
       if (localStorage.getItem("defaultData") === null) {
-        setServerErr(true);
+        setSnackBMes("Сервер не отвечает. Свяжитесь с поддержкой.");
+        setOpenSnackB(true);
       }
       if (localStorage.getItem("defaultData") !== null && !auth) {
         setData(localStorage.getItem("defaultData"));
@@ -142,7 +147,8 @@ function App() {
       }
     }
     if (String(fetchDataErr).includes("404")) {
-      setDataErr(true);
+      setSnackBMes("Список баз не найден. Свяжитесь с поддержкой.");
+      setOpenSnackB(true);
     }
   };
 
@@ -233,44 +239,8 @@ function App() {
     }
   };
 
-  const [serverErr, setServerErr] = useState(false);
-  const [settingsErr, setSettingsErr] = useState(false);
-  const [dataErr, setDataErr] = useState(false);
-
-  const renderButton = () => {
-    if (serverErr) {
-      return (
-        <Alert severity="error">
-          Сервер не отвечает. Свяжитесь с поддержкой
-        </Alert>
-      );
-    }
-    if (settingsErr) {
-      return (
-        <Alert severity="error">
-          Файл настроек не найден. Свяжитесь с поддержкой
-        </Alert>
-      );
-    }
-    if (dataErr) {
-      return (
-        <Alert severity="error">
-          Список баз не найден. Свяжитесь с поддержкой
-        </Alert>
-      );
-    } else {
-      return (
-        <LoadingButton
-          variant="contained"
-          onClick={() => handleOpenDialog()}
-          loading={loadingStatus}
-          disabled={wait}
-          sx={{ borderRadius: 4 }}
-        >
-          <ViewListRoundedIcon />
-        </LoadingButton>
-      );
-    }
+  const handleCloseSnackB = () => {
+    setOpenSnackB(false);
   };
 
   let appBar = (
@@ -319,9 +289,6 @@ function App() {
         switchToTreeFolder,
         setVisibleAuth,
         setOpenDialog,
-        setServerErr,
-        setSettingsErr,
-        setDataErr,
         setHeader,
         setIsOnline,
         setIsOnlineIcon,
@@ -329,6 +296,8 @@ function App() {
         setBackDrop,
         expanded,
         setExpanded,
+        setOpenSnackB,
+        setSnackBMes,
       }}
     >
       <React.Fragment>
@@ -337,13 +306,32 @@ function App() {
           sx={{
             height: 50,
             width: 55,
-            // display: "flex",
-            // justifyContent: "center",
-            // alignItems: "center",
-            // mx: "auto",
           }}
         >
-          {renderButton()}
+          <Snackbar
+            open={openSnackB}
+            onClose={handleCloseSnackB}
+            message={snackBMes}
+            action={
+              <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={handleCloseSnackB}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            }
+          ></Snackbar>
+          <LoadingButton
+            variant="contained"
+            onClick={() => handleOpenDialog()}
+            loading={loadingStatus}
+            disabled={wait}
+            sx={{ borderRadius: 1 }}
+          >
+            MiBase
+          </LoadingButton>
         </Box>
         <Dialog open={openDialog} PaperComponent={PaperComponent}>
           <Box

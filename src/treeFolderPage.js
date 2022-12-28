@@ -219,7 +219,7 @@ export default function TreeFolderPage() {
             border: 1,
             height: 370,
             maxWidth: 510,
-            borderRadius: 0,
+            borderRadius: 1,
           }}
         >
           <TreeView
