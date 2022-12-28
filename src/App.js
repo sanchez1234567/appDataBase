@@ -4,7 +4,6 @@ import { Typography, AppBar, Toolbar, IconButton } from "@mui/material";
 import { CircularProgress } from "@mui/material";
 import { Tooltip } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import Paper, { PaperProps } from "@mui/material/Paper";
 import InstallDesktopIcon from "@mui/icons-material/InstallDesktop";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HelpIcon from "@mui/icons-material/Help";
@@ -25,9 +24,9 @@ import SendNewSettings from "./functions/SendNewSettings.js";
 const DataContext = React.createContext();
 const useData = () => useContext(DataContext);
 
-function PaperComponent(props: PaperProps) {
-  return <Paper {...props} />;
-}
+// function PaperComponent(props: PaperProps) {
+//   return <Paper {...props} />;
+// }
 
 function App(customUrl) {
   const [appSettings, setAppSettings] = useState([]);
@@ -344,7 +343,7 @@ function App(customUrl) {
             MiBase
           </LoadingButton>
         </Box>
-        <Dialog open={openDialog} PaperComponent={PaperComponent}>
+        <Dialog open={openDialog}>
           <Box
             height={visibleAuth ? 300 : 500}
             width={530}
