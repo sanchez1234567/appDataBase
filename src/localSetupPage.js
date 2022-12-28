@@ -66,7 +66,7 @@ export default function LocalSetupPage() {
               variant="contained"
               size="medium"
               onClick={handleBack}
-              sx={{ borderRadius: 0 }}
+              sx={{ borderRadius: 1, mr: 1 }}
               disabled={activeStep === 0 ? true : false}
             >
               назад
@@ -75,7 +75,7 @@ export default function LocalSetupPage() {
               variant="contained"
               size="medium"
               onClick={handleNext}
-              sx={{ borderRadius: 0 }}
+              sx={{ borderRadius: 1, ml: 1 }}
               disabled={activeStep === 2 ? true : false}
             >
               далее
