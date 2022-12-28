@@ -98,7 +98,7 @@ export default function AuthPage() {
       ) {
         setVisibleAuth(false);
         setOpenDialog(false);
-        setSnackBMes("Сервер не отвечает. Свяжитесь с поддержкой.");
+        setSnackBMes("Сервер MiBase не отвечает. Свяжитесь с поддержкой.");
         setOpenSnackB(true);
       }
       if (
@@ -122,7 +122,7 @@ export default function AuthPage() {
     if (String(errUserSet).includes("404")) {
       setVisibleAuth(false);
       setOpenDialog(false);
-      setSnackBMes("Файл настроек не найден. Свяжитесь с поддержкой.");
+      setSnackBMes("Файл настроек MiBase не найден. Свяжитесь с поддержкой.");
       setOpenSnackB(true);
     }
   };
@@ -160,7 +160,7 @@ export default function AuthPage() {
       if (localStorage.getItem(`${currentUser.name}Data`) === null) {
         setVisibleAuth(false);
         setOpenDialog(false);
-        setSnackBMes("Сервер не отвечает. Свяжитесь с поддержкой.");
+        setSnackBMes("Сервер MiBase не отвечает. Свяжитесь с поддержкой.");
         setOpenSnackB(true);
       }
       if (localStorage.getItem(`${currentUser.name}Data`) !== null) {
@@ -209,7 +209,7 @@ export default function AuthPage() {
     if (String(errUserData).includes("404")) {
       setVisibleAuth(false);
       setOpenDialog(false);
-      setSnackBMes("Список баз не найден. Свяжитесь с поддержкой.");
+      setSnackBMes("Список баз MiBase не найден. Свяжитесь с поддержкой.");
       setOpenSnackB(true);
     }
   };

@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { CssBaseline, Box, Dialog, Snackbar } from "@mui/material";
 import { Typography, AppBar, Toolbar, IconButton } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { Tooltip } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Paper, { PaperProps } from "@mui/material/Paper";
@@ -12,6 +13,7 @@ import ComputerIcon from "@mui/icons-material/Computer";
 import CancelIcon from "@mui/icons-material/Cancel";
 import UndoIcon from "@mui/icons-material/Undo";
 import CloseIcon from "@mui/icons-material/Close";
+import ErrorIcon from "@mui/icons-material/Error";
 import TreeFolderPage from "./TreeFolderPage.js";
 import AuthPage from "./AuthPage.js";
 import LocalSetupPage from "./LocalSetupPage.js";
@@ -27,9 +29,12 @@ function PaperComponent(props: PaperProps) {
   return <Paper {...props} />;
 }
 
-function App() {
+function App(customUrl) {
   const [appSettings, setAppSettings] = useState([]);
   const [loadingStatus, setLoadingStatus] = useState(true);
+  const [loadingButtonIndicator, setLoadingButtonIndicator] = useState(
+    <CircularProgress color="inherit" size={16} />
+  );
   const [wait, setWait] = useState(true);
   const [auth, setAuth] = useState(false);
   const [isOnline, setIsOnline] = useState("");
@@ -71,8 +76,8 @@ function App() {
     settings: appSettings,
   };
 
-  const getAppSettings = async () => {
-    const responseAppSet = await fetch("http://localhost:5000/defaultSettings");
+  const getAppSettings = async (url) => {
+    const responseAppSet = await fetch(url);
     if (responseAppSet.ok) {
       const resultAppSet = await responseAppSet.json();
       setAppSettings(resultAppSet);
@@ -89,7 +94,8 @@ function App() {
   const handleErrSettings = (fetchErr) => {
     if (String(fetchErr).includes("Failed to fetch")) {
       if (localStorage.getItem("defaultAppSettings") === null) {
-        setSnackBMes("Сервер не отвечает. Свяжитесь с поддержкой.");
+        setSnackBMes("Сервер MiBase не отвечает. Свяжитесь с поддержкой.");
+        setLoadingButtonIndicator(<ErrorIcon />);
         setOpenSnackB(true);
       }
       if (localStorage.getItem("defaultAppSettings") !== null) {
@@ -103,14 +109,15 @@ function App() {
       }
     }
     if (String(fetchErr).includes("404")) {
-      setSnackBMes("Файл настроек не найден. Свяжитесь с поддержкой.");
+      setSnackBMes("Файл настроек MiBase не найден. Свяжитесь с поддержкой.");
+      setLoadingButtonIndicator(<ErrorIcon />);
       setOpenSnackB(true);
     }
   };
 
   useEffect(() => {
-    getAppSettings().catch((err) => handleErrSettings(err));
-  }, []);
+    getAppSettings(customUrl.url).catch((err) => handleErrSettings(err));
+  }, [customUrl]);
 
   const getData = async () => {
     try {
@@ -135,7 +142,8 @@ function App() {
   const handleErrData = async (fetchDataErr) => {
     if (String(fetchDataErr).includes("Failed to fetch")) {
       if (localStorage.getItem("defaultData") === null) {
-        setSnackBMes("Сервер не отвечает. Свяжитесь с поддержкой.");
+        setSnackBMes("Сервер MiBase не отвечает. Свяжитесь с поддержкой.");
+        setLoadingButtonIndicator(<ErrorIcon />);
         setOpenSnackB(true);
       }
       if (localStorage.getItem("defaultData") !== null && !auth) {
@@ -147,7 +155,7 @@ function App() {
       }
     }
     if (String(fetchDataErr).includes("404")) {
-      setSnackBMes("Список баз не найден. Свяжитесь с поддержкой.");
+      setSnackBMes("Список баз MiBase не найден. Свяжитесь с поддержкой.");
       setOpenSnackB(true);
     }
   };
@@ -202,6 +210,8 @@ function App() {
   };
 
   const closeApp = () => {
+    setUserName("");
+    setUserPassword("");
     setVisibleAuth(false);
     setVisibleLocalSetup(false);
     setVisibleSettings(false);
@@ -327,6 +337,7 @@ function App() {
             variant="contained"
             onClick={() => handleOpenDialog()}
             loading={loadingStatus}
+            loadingIndicator={loadingButtonIndicator}
             disabled={wait}
             sx={{ borderRadius: 1 }}
           >
