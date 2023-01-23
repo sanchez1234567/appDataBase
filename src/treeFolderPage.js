@@ -18,7 +18,7 @@ export default function TreeFolderPage() {
   const { currentUserSet } = useData();
   const { backDrop } = useData();
   const { setBackDrop } = useData();
-  const { expanded } = useData();
+  const { expanded } = useData(["root"]);
   const { setExpanded } = useData();
 
   const [folder, setFolder] = useState("");
@@ -34,10 +34,12 @@ export default function TreeFolderPage() {
   };
 
   const idAddRemove = (itemId) => {
-    if (!expanded.includes(String(itemId))) {
-      setExpanded((oldArr) => [...oldArr, String(itemId)]);
-    } else {
-      setExpanded((oldArr) => oldArr.filter((str) => str !== String(itemId)));
+    if (String(itemId) !== "root") {
+      if (!expanded.includes(String(itemId))) {
+        setExpanded((oldArr) => [...oldArr, String(itemId)]);
+      } else {
+        setExpanded((oldArr) => oldArr.filter((str) => str !== String(itemId)));
+      }
     }
   };
 
@@ -145,14 +147,16 @@ export default function TreeFolderPage() {
   };
 
   const renderFolder = (f) => {
-    if (f.includes("https")) {
-      return (
-        <Link component="button" variant="body1" onClick={() => openLink(f)}>
-          {f}
-        </Link>
-      );
-    } else {
-      return <Typography>{folder}</Typography>;
+    if (!f.includes("root")) {
+      if (f.includes("https")) {
+        return (
+          <Link component="button" variant="body1" onClick={() => openLink(f)}>
+            {f}
+          </Link>
+        );
+      } else {
+        return <Typography>{folder}</Typography>;
+      }
     }
   };
 

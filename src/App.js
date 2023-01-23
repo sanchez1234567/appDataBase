@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { CssBaseline, Box, Dialog, Snackbar } from "@mui/material";
 import { Typography, AppBar, Toolbar, IconButton } from "@mui/material";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Paper } from "@mui/material";
 import { Tooltip } from "@mui/material";
+import Draggable from "react-draggable";
 import LoadingButton from "@mui/lab/LoadingButton";
 import InstallDesktopIcon from "@mui/icons-material/InstallDesktop";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -24,9 +25,16 @@ import SendNewSettings from "./functions/SendNewSettings.js";
 const DataContext = React.createContext();
 const useData = () => useContext(DataContext);
 
-// function PaperComponent(props: PaperProps) {
-//   return <Paper {...props} />;
-// }
+function PaperComponent(props) {
+  return (
+    <Draggable
+      handle="#draggable-dialog-title"
+      cancel={'[class*="MuiDialogContent-root"]'}
+    >
+      <Paper {...props} />
+    </Draggable>
+  );
+}
 
 function App(customUrl) {
   const [appSettings, setAppSettings] = useState([]);
@@ -311,12 +319,7 @@ function App(customUrl) {
     >
       <React.Fragment>
         <CssBaseline />
-        <Box
-          sx={{
-            height: 50,
-            width: 55,
-          }}
-        >
+        <Box>
           <Snackbar
             open={openSnackB}
             onClose={handleCloseSnackB}
@@ -343,13 +346,23 @@ function App(customUrl) {
             MiBase
           </LoadingButton>
         </Box>
-        <Dialog open={openDialog}>
+        <Dialog
+          open={openDialog}
+          PaperComponent={PaperComponent}
+          aria-labelledby="draggable-dialog-title"
+        >
           <Box
             height={visibleAuth ? 300 : 500}
             width={530}
             sx={{ boxShadow: 1 }}
           >
-            <Box sx={{ flexGrow: 1 }}>{visibleAppBar ? appBar : null}</Box>
+            <Box
+              style={{ cursor: "default" }}
+              id="draggable-dialog-title"
+              sx={{ flexGrow: 1 }}
+            >
+              {visibleAppBar ? appBar : null}
+            </Box>
             {visibleAuth ? <AuthPage /> : null}
             {visibleTreeFolder ? <TreeFolderPage /> : null}
             {visibleLocalSetup ? <LocalSetupPage /> : null}
