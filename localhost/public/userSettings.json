@@ -12,10 +12,7 @@
       "Header": "Настройки",
       "OpenInNew": false,
       "TreeView": false,
-      "LastSelect": [
-        false,
-        "8ff63387-6421-410e-b2f8-aae592b4cac0"
-      ],
+      "LastSelect": [false, "8ff63387-6421-410e-b2f8-aae592b4cac0"],
       "SortAZ": false
     },
     "Help": {
@@ -25,7 +22,7 @@
       "site": "https://www.site.ru",
       "HelpMessage": {
         "method": "POST",
-        "address": "https://www.site.ru/helpMessage"
+        "address": "http://localhost:5000/userMessage"
       }
     },
     "Setup": {

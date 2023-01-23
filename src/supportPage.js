@@ -36,7 +36,7 @@ export default function SupportPage() {
     setBackDropText("отправка сообщения");
     try {
       const sendFetch = await fetch(
-        `http://localhost:5000/${user.name}Message`,
+        appSettings.UserSettings.Help.HelpMessage.address,
         {
           method: "POST",
           headers: {

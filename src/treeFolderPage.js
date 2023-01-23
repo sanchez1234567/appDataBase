@@ -235,7 +235,6 @@ export default function TreeFolderPage() {
             defaultExpandIcon={<ChevronRightIcon />}
             sx={{
               height: 350,
-              flexGrow: 1,
               maxWidth: 480,
               overflowY: "auto",
             }}
