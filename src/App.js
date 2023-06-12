@@ -1,17 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
 import { CssBaseline, Box, Dialog, Snackbar } from "@mui/material";
-import { Typography, AppBar, Toolbar, IconButton } from "@mui/material";
-import { CircularProgress, Paper } from "@mui/material";
-import { Tooltip } from "@mui/material";
-import Draggable from "react-draggable";
+import { IconButton } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import InstallDesktopIcon from "@mui/icons-material/InstallDesktop";
-import SettingsIcon from "@mui/icons-material/Settings";
-import HelpIcon from "@mui/icons-material/Help";
-import LanguageIcon from "@mui/icons-material/Language";
-import ComputerIcon from "@mui/icons-material/Computer";
-import CancelIcon from "@mui/icons-material/Cancel";
-import UndoIcon from "@mui/icons-material/Undo";
 import CloseIcon from "@mui/icons-material/Close";
 import ErrorIcon from "@mui/icons-material/Error";
 import TreeFolderPage from "./TreeFolderPage.js";
@@ -21,20 +12,11 @@ import SettingsPage from "./SettingsPage.js";
 import SupportPage from "./SupportPage.js";
 import RepeatSendNewSettings from "./functions/RepeatSendNewSettings.js";
 import SendNewSettings from "./functions/SendNewSettings.js";
+import PaperComponent from "./components/PaperComponent.js";
+import CustomAppBar from "./components/CustomAppBar.js";
 
 const DataContext = React.createContext();
 const useData = () => useContext(DataContext);
-
-function PaperComponent(props) {
-  return (
-    <Draggable
-      handle="#draggable-dialog-title"
-      cancel={'[class*="MuiDialogContent-root"]'}
-    >
-      <Paper {...props} />
-    </Draggable>
-  );
-}
 
 function App(customUrl) {
   const [appSettings, setAppSettings] = useState([]);
@@ -260,34 +242,10 @@ function App(customUrl) {
     setOpenSnackB(false);
   };
 
-  let appBar = (
-    <AppBar position="static">
-      <Toolbar>
-        <Tooltip title={isOnline} placement="top">
-          {isOnlineIcon ? <LanguageIcon /> : <ComputerIcon />}
-        </Tooltip>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, ml: 1.5 }}>
-          {header}
-        </Typography>
-        <IconButton component="label" onClick={switchToSetupPage}>
-          <InstallDesktopIcon />
-        </IconButton>
-        <IconButton component="label" onClick={switchToSettingsPage}>
-          <SettingsIcon />
-        </IconButton>
-        <IconButton component="label" onClick={switchToSupportPage}>
-          <HelpIcon />
-        </IconButton>
-        <IconButton component="label" onClick={undoPage}>
-          {visibleTreeFolder ? <CancelIcon /> : <UndoIcon />}
-        </IconButton>
-      </Toolbar>
-    </AppBar>
-  );
-
   return (
     <DataContext.Provider
       value={{
+        header,
         auth,
         settingsObj,
         setSettingsObj,
@@ -303,11 +261,16 @@ function App(customUrl) {
         setAppSettings,
         undoPage,
         switchToSetupPage,
+        switchToSettingsPage,
+        switchToSupportPage,
         switchToTreeFolder,
+        visibleTreeFolder,
         setVisibleAuth,
         setOpenDialog,
         setHeader,
+        isOnline,
         setIsOnline,
+        isOnlineIcon,
         setIsOnlineIcon,
         backDrop,
         setBackDrop,
@@ -361,7 +324,7 @@ function App(customUrl) {
               id="draggable-dialog-title"
               sx={{ flexGrow: 1 }}
             >
-              {visibleAppBar ? appBar : null}
+              {visibleAppBar ? <CustomAppBar /> : null}
             </Box>
             {visibleAuth ? <AuthPage /> : null}
             {visibleTreeFolder ? <TreeFolderPage /> : null}
