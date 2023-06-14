@@ -1,9 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
-import { CssBaseline, Box, Dialog, Snackbar } from "@mui/material";
-import { IconButton } from "@mui/material";
+import { CssBaseline, Box, Dialog } from "@mui/material";
 import { CircularProgress } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import CloseIcon from "@mui/icons-material/Close";
 import ErrorIcon from "@mui/icons-material/Error";
 import TreeFolderPage from "./TreeFolderPage.js";
 import AuthPage from "./AuthPage.js";
@@ -14,6 +12,7 @@ import RepeatSendNewSettings from "./functions/RepeatSendNewSettings.js";
 import SendNewSettings from "./functions/SendNewSettings.js";
 import PaperComponent from "./components/PaperComponent.js";
 import CustomAppBar from "./components/CustomAppBar.js";
+import AppSnackbar from "./components/AppSnackbar.js";
 
 const DataContext = React.createContext();
 const useData = () => useContext(DataContext);
@@ -283,21 +282,12 @@ function App(customUrl) {
       <React.Fragment>
         <CssBaseline />
         <Box>
-          <Snackbar
-            open={openSnackB}
-            onClose={handleCloseSnackB}
-            message={snackBMes}
-            action={
-              <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={handleCloseSnackB}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            }
-          ></Snackbar>
+          <AppSnackbar
+            openAS={openSnackB}
+            closeAS={handleCloseSnackB}
+            mesAS={snackBMes}
+            clickAS={handleCloseSnackB}
+          />
           <LoadingButton
             variant="contained"
             onClick={() => handleOpenDialog()}
