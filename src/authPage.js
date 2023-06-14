@@ -13,7 +13,7 @@ export default function AuthPage() {
   const { setUserPassword } = useData();
   const { setAppSettings } = useData();
   const { switchToTreeFolder } = useData();
-  const { setVisibleAuth } = useData();
+  const { setVisible } = useData();
   const { setOpenDialog } = useData();
   const { setHeader } = useData();
   const { currentUser } = useData();
@@ -96,7 +96,10 @@ export default function AuthPage() {
           `${currentUser.name}/${currentUser.password}Settings`
         ) === null
       ) {
-        setVisibleAuth(false);
+        //setVisibleAuth(false);
+        setVisible((obj) => {
+          return { ...obj, cAuth: false };
+        });
         setOpenDialog(false);
         setSnackBMes("Сервер MiBase не отвечает. Свяжитесь с поддержкой.");
         setOpenSnackB(true);
@@ -120,7 +123,10 @@ export default function AuthPage() {
       setLoadStatus(false);
     }
     if (String(errUserSet).includes("404")) {
-      setVisibleAuth(false);
+      //setVisibleAuth(false);
+      setVisible((obj) => {
+        return { ...obj, cAuth: false };
+      });
       setOpenDialog(false);
       setSnackBMes("Файл настроек MiBase не найден. Свяжитесь с поддержкой.");
       setOpenSnackB(true);
@@ -158,7 +164,10 @@ export default function AuthPage() {
   const handleErrData = (errUserData, localUserSet) => {
     if (String(errUserData).includes("Failed to fetch")) {
       if (localStorage.getItem(`${currentUser.name}Data`) === null) {
-        setVisibleAuth(false);
+        //setVisibleAuth(false);
+        setVisible((obj) => {
+          return { ...obj, cAuth: false };
+        });
         setOpenDialog(false);
         setSnackBMes("Сервер MiBase не отвечает. Свяжитесь с поддержкой.");
         setOpenSnackB(true);
@@ -207,7 +216,10 @@ export default function AuthPage() {
       setLoadStatus(false);
     }
     if (String(errUserData).includes("404")) {
-      setVisibleAuth(false);
+      //setVisibleAuth(false);
+      setVisible((obj) => {
+        return { ...obj, cAuth: false };
+      });
       setOpenDialog(false);
       setSnackBMes("Список баз MiBase не найден. Свяжитесь с поддержкой.");
       setOpenSnackB(true);

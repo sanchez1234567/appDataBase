@@ -17,7 +17,7 @@ export default function CustomAppBar() {
   const { switchToSettingsPage } = useData();
   const { switchToSupportPage } = useData();
   const { undoPage } = useData();
-  const { visibleTreeFolder } = useData();
+  const { cVisible } = useData();
 
   return (
     <AppBar position="static">
@@ -38,7 +38,7 @@ export default function CustomAppBar() {
           <HelpIcon />
         </IconButton>
         <IconButton component="label" onClick={undoPage}>
-          {visibleTreeFolder ? <CancelIcon /> : <UndoIcon />}
+          {cVisible.cTreeFolder ? <CancelIcon /> : <UndoIcon />}
         </IconButton>
       </Toolbar>
     </AppBar>

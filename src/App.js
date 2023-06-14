@@ -38,12 +38,15 @@ function App(customUrl) {
   const [openDialog, setOpenDialog] = useState(false);
 
   const [header, setHeader] = useState("");
-  const [visibleAuth, setVisibleAuth] = useState(false);
-  const [visibleTreeFolder, setVisibleTreeFolder] = useState(false);
-  const [visibleLocalSetup, setVisibleLocalSetup] = useState(false);
-  const [visibleSettings, setVisibleSettings] = useState(false);
-  const [visibleSupport, setVisibleSupport] = useState(false);
-  const [visibleAppBar, setVisibleAppBar] = useState(false);
+
+  const [cVisible, setVisible] = useState({
+    cAuth: false,
+    cTreeFolder: false,
+    cLocalSetup: false,
+    cSettings: false,
+    cSupport: false,
+    cAppBar: false,
+  });
 
   const [settingsObj, setSettingsObj] = useState({
     openInNew: false,
@@ -155,63 +158,125 @@ function App(customUrl) {
     if (auth) {
       RepeatSendNewSettings();
       setOpenDialog(true);
-      setVisibleAuth(true);
+      setVisible((obj) => {
+        return { ...obj, cAuth: true };
+      });
     }
   };
 
   const switchToSetupPage = () => {
     setHeader(appSettings.UserSettings.Setup.Header);
-    setVisibleAuth(false);
-    setVisibleLocalSetup(true);
-    setVisibleSettings(false);
-    setVisibleSupport(false);
-    setVisibleTreeFolder(false);
-    setVisibleAppBar(true);
+    setVisible((obj) => {
+      return { ...obj, cAuth: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cLocalSetup: true };
+    });
+    setVisible((obj) => {
+      return { ...obj, cSettings: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cSupport: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cTreeFolder: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cAppBar: true };
+    });
   };
   const switchToSettingsPage = () => {
     setHeader(appSettings.UserSettings.Settings.Header);
-    setVisibleAuth(false);
-    setVisibleLocalSetup(false);
-    setVisibleSettings(true);
-    setVisibleSupport(false);
-    setVisibleTreeFolder(false);
-    setVisibleAppBar(true);
+    setVisible((obj) => {
+      return { ...obj, cAuth: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cLocalSetup: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cSettings: true };
+    });
+    setVisible((obj) => {
+      return { ...obj, cSupport: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cTreeFolder: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cAppBar: true };
+    });
   };
   const switchToSupportPage = () => {
     setHeader(appSettings.UserSettings.Help.Header);
-    setVisibleAuth(false);
-    setVisibleLocalSetup(false);
-    setVisibleSettings(false);
-    setVisibleSupport(true);
-    setVisibleTreeFolder(false);
-    setVisibleAppBar(true);
+    setVisible((obj) => {
+      return { ...obj, cAuth: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cLocalSetup: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cSettings: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cSupport: true };
+    });
+    setVisible((obj) => {
+      return { ...obj, cTreeFolder: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cAppBar: true };
+    });
   };
 
-  const switchToTreeFolder = async () => {
+  const switchToTreeFolder = () => {
     setHeader("Список баз");
-    setVisibleAuth(false);
-    setVisibleLocalSetup(false);
-    setVisibleSettings(false);
-    setVisibleSupport(false);
-    setVisibleTreeFolder(true);
-    setVisibleAppBar(true);
+    setVisible((obj) => {
+      return { ...obj, cAuth: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cLocalSetup: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cSettings: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cSupport: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cTreeFolder: true };
+    });
+    setVisible((obj) => {
+      return { ...obj, cAppBar: true };
+    });
   };
 
   const closeApp = () => {
     setUserName("");
     setUserPassword("");
-    setVisibleAuth(false);
-    setVisibleLocalSetup(false);
-    setVisibleSettings(false);
-    setVisibleSupport(false);
-    setVisibleTreeFolder(false);
-    setVisibleAppBar(false);
+    setVisible((obj) => {
+      return { ...obj, cAuth: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cLocalSetup: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cSettings: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cSupport: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cTreeFolder: false };
+    });
+    setVisible((obj) => {
+      return { ...obj, cAppBar: false };
+    });
     setOpenDialog(false);
   };
 
   const undoPage = () => {
     if (!settingsObj.lastSelect) {
-      if (visibleTreeFolder === false) {
+      if (cVisible.cTreeFolder === false) {
         switchToTreeFolder();
       } else {
         closeApp();
@@ -219,7 +284,7 @@ function App(customUrl) {
     }
     if (settingsObj.lastSelect) {
       if (settingsObj.openInNew)
-        if (visibleTreeFolder === false) {
+        if (cVisible.cTreeFolder === false) {
           switchToTreeFolder();
         } else {
           setBackDrop(true);
@@ -228,7 +293,7 @@ function App(customUrl) {
             .then(() => closeApp());
         }
       if (!settingsObj.openInNew) {
-        if (visibleTreeFolder === false) {
+        if (cVisible.cTreeFolder === false) {
           switchToTreeFolder();
         } else {
           closeApp();
@@ -248,6 +313,8 @@ function App(customUrl) {
         auth,
         settingsObj,
         setSettingsObj,
+        cVisible,
+        setVisible,
         data,
         setData,
         currentUser,
@@ -263,8 +330,6 @@ function App(customUrl) {
         switchToSettingsPage,
         switchToSupportPage,
         switchToTreeFolder,
-        visibleTreeFolder,
-        setVisibleAuth,
         setOpenDialog,
         setHeader,
         isOnline,
@@ -305,7 +370,7 @@ function App(customUrl) {
           aria-labelledby="draggable-dialog-title"
         >
           <Box
-            height={visibleAuth ? 300 : 500}
+            height={cVisible.cAuth ? 300 : 500}
             width={530}
             sx={{ boxShadow: 1 }}
           >
@@ -314,13 +379,13 @@ function App(customUrl) {
               id="draggable-dialog-title"
               sx={{ flexGrow: 1 }}
             >
-              {visibleAppBar ? <CustomAppBar /> : null}
+              {cVisible.cAppBar ? <CustomAppBar /> : null}
             </Box>
-            {visibleAuth ? <AuthPage /> : null}
-            {visibleTreeFolder ? <TreeFolderPage /> : null}
-            {visibleLocalSetup ? <LocalSetupPage /> : null}
-            {visibleSettings ? <SettingsPage /> : null}
-            {visibleSupport ? <SupportPage /> : null}
+            {cVisible.cAuth ? <AuthPage /> : null}
+            {cVisible.cTreeFolder ? <TreeFolderPage /> : null}
+            {cVisible.cLocalSetup ? <LocalSetupPage /> : null}
+            {cVisible.cSettings ? <SettingsPage /> : null}
+            {cVisible.cSupport ? <SupportPage /> : null}
           </Box>
         </Dialog>
       </React.Fragment>
