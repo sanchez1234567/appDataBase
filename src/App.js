@@ -185,6 +185,7 @@ function App(customUrl) {
       return { ...obj, cAppBar: true };
     });
   };
+
   const switchToSettingsPage = () => {
     setHeader(appSettings.UserSettings.Settings.Header);
     setVisible((obj) => {
@@ -206,6 +207,7 @@ function App(customUrl) {
       return { ...obj, cAppBar: true };
     });
   };
+
   const switchToSupportPage = () => {
     setHeader(appSettings.UserSettings.Help.Header);
     setVisible((obj) => {

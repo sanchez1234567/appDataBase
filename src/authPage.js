@@ -96,7 +96,6 @@ export default function AuthPage() {
           `${currentUser.name}/${currentUser.password}Settings`
         ) === null
       ) {
-        //setVisibleAuth(false);
         setVisible((obj) => {
           return { ...obj, cAuth: false };
         });
@@ -123,7 +122,6 @@ export default function AuthPage() {
       setLoadStatus(false);
     }
     if (String(errUserSet).includes("404")) {
-      //setVisibleAuth(false);
       setVisible((obj) => {
         return { ...obj, cAuth: false };
       });
@@ -164,7 +162,6 @@ export default function AuthPage() {
   const handleErrData = (errUserData, localUserSet) => {
     if (String(errUserData).includes("Failed to fetch")) {
       if (localStorage.getItem(`${currentUser.name}Data`) === null) {
-        //setVisibleAuth(false);
         setVisible((obj) => {
           return { ...obj, cAuth: false };
         });
@@ -216,7 +213,6 @@ export default function AuthPage() {
       setLoadStatus(false);
     }
     if (String(errUserData).includes("404")) {
-      //setVisibleAuth(false);
       setVisible((obj) => {
         return { ...obj, cAuth: false };
       });
